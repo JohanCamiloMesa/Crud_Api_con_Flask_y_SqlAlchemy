@@ -13,7 +13,13 @@
             </li>
         </ul>
         
-        <span class="navbar-text ms-auto">
+        <!-- Search bar in center -->
+        <form class="d-flex mx-auto" method="GET" action="{{ url_for('animes.search') }}" style="width: 900px;">
+            <input class="form-control me-2" type="search" name="query" placeholder="Buscar anime por nombre" aria-label="Search">
+            <button class="btn btn-outline-light" type="submit">Buscar</button>
+        </form>
+        
+        <span class="navbar-text">
             Realizado por: Johan Camilo Mesa
         </span>
     </div>

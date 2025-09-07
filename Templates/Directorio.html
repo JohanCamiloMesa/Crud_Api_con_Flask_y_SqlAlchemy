@@ -11,6 +11,69 @@
         </div>
     </div>
 
+    <!-- Filters section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <form action="{{ url_for('animes.directory') }}" method="GET" class="d-flex flex-wrap align-items-center gap-3">
+                <div class="d-flex align-items-center">
+                    <label class="me-2 fw-bold">Género:</label>
+                    <select name="genre" class="form-select form-select-sm" style="min-width: 120px;">
+                        <option value="">Todos</option>
+                        <option value="Acción" {% if filters.genre == 'Acción' %}selected{% endif %}>Acción</option>
+                        <option value="Aventura" {% if filters.genre == 'Aventura' %}selected{% endif %}>Aventura</option>
+                        <option value="Comedia" {% if filters.genre == 'Comedia' %}selected{% endif %}>Comedia</option>
+                        <option value="Drama" {% if filters.genre == 'Drama' %}selected{% endif %}>Drama</option>
+                        <option value="Terror" {% if filters.genre == 'Terror' %}selected{% endif %}>Terror</option>
+                        <option value="Romance" {% if filters.genre == 'Romance' %}selected{% endif %}>Romance</option>
+                        <option value="Ciencia Ficción" {% if filters.genre == 'Ciencia Ficción' %}selected{% endif %}>Ciencia Ficción</option>
+                        <option value="Fantasy" {% if filters.genre == 'Fantasy' %}selected{% endif %}>Fantasy</option>
+                    </select>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <label class="me-2 fw-bold">Año:</label>
+                    <input type="number" name="year" class="form-control form-control-sm" 
+                           style="min-width: 100px;" 
+                           min="1900" 
+                           max="2100" 
+                           placeholder="Año" 
+                           value="{{ filters.year if filters.year else '' }}">
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <label class="me-2 fw-bold">Tipo:</label>
+                    <select name="type" class="form-select form-select-sm" style="min-width: 120px;">
+                        <option value="">Todos</option>
+                        <option value="TV" {% if filters.type == 'TV' %}selected{% endif %}>TV</option>
+                        <option value="Película" {% if filters.type == 'Película' %}selected{% endif %}>Película</option>
+                        <option value="OVA" {% if filters.type == 'OVA' %}selected{% endif %}>OVA</option>
+                        <option value="Especial" {% if filters.type == 'Especial' %}selected{% endif %}>Especial</option>
+                    </select>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <label class="me-2 fw-bold">Estado:</label>
+                    <select name="status" class="form-select form-select-sm" style="min-width: 140px;">
+                        <option value="">Todos</option>
+                        <option value="En emisión" {% if filters.status == 'En emisión' %}selected{% endif %}>En emisión</option>
+                        <option value="Finalizado" {% if filters.status == 'Finalizado' %}selected{% endif %}>Finalizado</option>
+                        <option value="Próximamente" {% if filters.status == 'Próximamente' %}selected{% endif %}>Próximamente</option>
+                    </select>
+                </div>
+
+                <div class="d-flex align-items-center">
+                    <label class="me-2 fw-bold">Orden:</label>
+                    <select name="order" class="form-select form-select-sm" style="min-width: 140px;">
+                        <option value="default" {% if filters.order == 'default' %}selected{% endif %}>Por Defecto</option>
+                        <option value="alphabetic" {% if filters.order == 'alphabetic' %}selected{% endif %}>Orden Alfabético</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-dark text-white fw-bold px-4">FILTRAR</button>
+            </form>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-12">
             {% if animes %}
@@ -29,8 +92,8 @@
                                 <div class="d-flex gap-2 mt-3">
                                     <a href="{{ url_for('animes.update_anime', id=anime.id) }}" class="btn btn-primary btn-sm flex-fill">Editar</a>
                                     <a href="{{ url_for('animes.delete_anime', id=anime.id) }}" 
-                                       class="btn btn-danger btn-sm flex-fill"
-                                       onclick="return confirm('¿Estás seguro de que quieres eliminar este anime?')">Eliminar</a>
+                                    class="btn btn-danger btn-sm flex-fill"
+                                    onclick="return confirm('¿Estás seguro de que quieres eliminar este anime?')">Eliminar</a>
                                 </div>
                             </div>
                         </div>
@@ -39,7 +102,7 @@
                 </div>
             {% else %}
                 <div class="alert alert-info text-center">
-                    No se encontraron animes
+                    No se encontraron animes{% if search_query %} para la búsqueda "{{ search_query }}"{% endif %}
                 </div>
             {% endif %}
         </div>

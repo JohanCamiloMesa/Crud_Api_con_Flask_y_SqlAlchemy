@@ -17,4 +17,3 @@ class Category(db.Model):
     name = Column(String(255), nullable=False)
     anime_id = Column(Integer, ForeignKey('Animes.id'))
     animes = relationship('anime', backref='category')
-

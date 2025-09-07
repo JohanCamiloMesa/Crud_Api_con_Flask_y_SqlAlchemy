@@ -2,7 +2,6 @@ from app import app
 from Utils.database import db
 from Models.anime_model import anime, Category
 from src.dbcreate import init_database
-from flask import redirect, url_for
 
 # Initialize database first
 init_database()
