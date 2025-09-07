@@ -1,0 +1,56 @@
+<form action="/new" method="post" class="card bg-dark text-light" style="margin-left: 20px; max-width: 400px;">
+    <div class="card-body p-4">
+        <div class="mb-3">
+            <label for="name">Nombre del Anime</label>
+            <input type="text" name="name" placeholder="Nombre del anime" 
+            class="form-control rounded-0 bg-light border-0" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="genre">Género</label>
+            <select name="genre" class="form-control rounded-0 bg-light border-0" required>
+                <option value="">Selecciona un género</option>
+                <option value="Acción">Acción</option>
+                <option value="Aventura">Aventura</option>
+                <option value="Comedia">Comedia</option>
+                <option value="Drama">Drama</option>
+                <option value="Terror">Terror</option>
+                <option value="Romance">Romance</option>
+                <option value="Ciencia Ficción">Ciencia Ficción</option>
+                <option value="Fantasy">Fantasy</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="year">Año</label>
+            <input type="number" name="year" placeholder="Año de lanzamiento"
+            class="form-control rounded-0 bg-light border-0" 
+            min="1900" max="2100" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="type">Tipo</label>
+            <select name="type" class="form-control rounded-0 bg-light border-0" required>
+                <option value="">Selecciona un tipo</option>
+                <option value="TV">TV</option>
+                <option value="Película">Película</option>
+                <option value="OVA">OVA</option>
+                <option value="Especial">Especial</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="status">Estado</label>
+            <select name="status" class="form-control rounded-0 bg-light border-0" required>
+                <option value="">Selecciona un estado</option>
+                <option value="En emisión">En emisión</option>
+                <option value="Finalizado">Finalizado</option>
+                <option value="Próximamente">Próximamente</option>
+            </select>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Guardar Anime</button>
+        </div>
+    </div>
+</form>

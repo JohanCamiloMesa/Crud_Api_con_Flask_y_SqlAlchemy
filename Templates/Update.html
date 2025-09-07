@@ -1,0 +1,67 @@
+{% extends "Layout.html" %}
+
+{% block body %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card bg-dark text-light mt-4">
+                <div class="card-body">
+                    <h3 class="text-center mb-4">Editar Anime</h3>
+                <form action="{{ url_for('animes.update_anime', id=anime.id) }}" method="POST">    
+                    <div class="mb-3">
+                        <label class="d-block">Actualizar nombre</label>
+                        <input type="text" name="name" value="{{ anime.name }}" 
+                        class="form-control rounded-0 bg-white border-0" 
+                        required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="d-block">Actualizar género</label>
+                        <select name="genre" class="form-control rounded-0 bg-white border-0" required>
+                            <option value="Acción" {% if anime.genre == 'Acción' %}selected{% endif %}>Acción</option>
+                            <option value="Aventura" {% if anime.genre == 'Aventura' %}selected{% endif %}>Aventura</option>
+                            <option value="Comedia" {% if anime.genre == 'Comedia' %}selected{% endif %}>Comedia</option>
+                            <option value="Drama" {% if anime.genre == 'Drama' %}selected{% endif %}>Drama</option>
+                            <option value="Terror" {% if anime.genre == 'Terror' %}selected{% endif %}>Terror</option>
+                            <option value="Romance" {% if anime.genre == 'Romance' %}selected{% endif %}>Romance</option>
+                            <option value="Ciencia Ficción" {% if anime.genre == 'Ciencia Ficción' %}selected{% endif %}>Ciencia Ficción</option>
+                            <option value="Fantasy" {% if anime.genre == 'Fantasy' %}selected{% endif %}>Fantasy</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="d-block">Actualizar año</label>
+                        <input type="number" name="year" value="{{ anime.year }}" 
+                        class="form-control rounded-0 bg-white border-0" 
+                        required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="d-block">Actualizar tipo</label>
+                        <select name="type" class="form-control rounded-0 bg-white border-0" required>
+                            <option value="TV" {% if anime.type == 'TV' %}selected{% endif %}>TV</option>
+                            <option value="Película" {% if anime.type == 'Película' %}selected{% endif %}>Película</option>
+                            <option value="OVA" {% if anime.type == 'OVA' %}selected{% endif %}>OVA</option>
+                            <option value="Especial" {% if anime.type == 'Especial' %}selected{% endif %}>Especial</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="d-block">Actualizar estado</label>
+                        <select name="status" class="form-control rounded-0 bg-white border-0" required>
+                            <option value="En emisión" {% if anime.status == 'En emisión' %}selected{% endif %}>En emisión</option>
+                            <option value="Finalizado" {% if anime.status == 'Finalizado' %}selected{% endif %}>Finalizado</option>
+                            <option value="Próximamente" {% if anime.status == 'Próximamente' %}selected{% endif %}>Próximamente</option>
+                        </select>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary flex-grow-1">Guardar</button>
+                        <a href="{{ url_for('animes.directory') }}" class="btn btn-secondary flex-grow-1">Volver</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

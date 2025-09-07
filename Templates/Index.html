@@ -1,0 +1,12 @@
+{% extends "Layout.html" %}
+
+{% block body %}
+
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh; padding-top: 2rem;">
+    <div class="w-100" style="max-width: 400px;">
+        {% include 'Partials/_message.html' %}
+        {% include 'Partials/_taskform.html' %}
+    </div>
+</div>
+
+{% endblock %}

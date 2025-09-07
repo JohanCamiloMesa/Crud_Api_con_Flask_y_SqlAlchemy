@@ -1,0 +1,49 @@
+{% extends "Layout.html" %}
+
+{% block body %}
+
+<div class="container-fluid">
+    <!-- Header with title -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="text-center mb-3">Lista completa de Animes</h2>
+            {% include 'Partials/_message.html' %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            {% if animes %}
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    {% for anime in animes %}
+                    <div class="col">
+                        <div class="card h-100 bg-dark text-white">
+                            <div class="card-body">
+                                <h5 class="card-title">{{anime.name}}</h5>
+                                <p class="card-text">Género: {{anime.genre}}</p>
+                                <p class="card-text">Año: {{anime.year}}</p>
+                                <p class="card-text">Tipo: {{anime.type}}</p>
+                                <p class="card-text">Estado: {{anime.status}}</p>
+                                
+                                <!-- Buttons for edit and delete -->
+                                <div class="d-flex gap-2 mt-3">
+                                    <a href="{{ url_for('animes.update_anime', id=anime.id) }}" class="btn btn-primary btn-sm flex-fill">Editar</a>
+                                    <a href="{{ url_for('animes.delete_anime', id=anime.id) }}" 
+                                       class="btn btn-danger btn-sm flex-fill"
+                                       onclick="return confirm('¿Estás seguro de que quieres eliminar este anime?')">Eliminar</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center">
+                    No se encontraron animes
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
