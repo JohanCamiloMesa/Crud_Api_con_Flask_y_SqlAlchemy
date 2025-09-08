@@ -221,22 +221,6 @@ CREATE TABLE Categories (
 - **type**: Tipo de anime (STRING, NOT NULL)
 - **status**: Estado del anime (STRING, NOT NULL)
 
-## 🏗️ Arquitectura
-
-### Patrón MVC
-
-La aplicación sigue el patrón Modelo-Vista-Controlador:
-
-- **Modelos** (`Models/`): Definen la estructura de datos
-- **Vistas** (`Templates/`): Presentación de la interfaz
-- **Controladores** (`Controller/`): Lógica de rutas y manejo de requests
-
-### Separación de Responsabilidades
-
-- **Servicios** (`Services/`): Lógica de negocio
-- **Configuración** (`Config/`): Configuraciones de la aplicación
-- **Utilidades** (`Utils/`): Herramientas auxiliares
-
 ## 🔧 Desarrollo
 
 ### Estructura de Código
@@ -245,6 +229,12 @@ La aplicación sigue el patrón Modelo-Vista-Controlador:
 2. **Servicios**: Implementa la lógica de negocio y validaciones
 3. **Controladores**: Maneja las rutas HTTP y la interacción con los servicios
 4. **Templates**: Renderiza la interfaz de usuario con Jinja2
+
+### Separación de Responsabilidades
+
+- **Servicios** (`Services/`): Lógica de negocio
+- **Configuración** (`Config/`): Configuraciones de la aplicación
+- **Utilidades** (`Utils/`): Herramientas auxiliares
 
 ### Validaciones Implementadas
 
