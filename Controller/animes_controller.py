@@ -7,7 +7,7 @@ y las vistas (templates). Implementa el patrón MVC como controlador.
 """
 
 # Importaciones de Flask para manejo de rutas y respuestas HTTP
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 
 # Importación del modelo de datos
 from Models.anime_model import anime
@@ -169,16 +169,16 @@ def add_anime():
     Endpoint para actualizar un anime existente.
     
     Maneja tanto la visualización del formulario de edición (GET)
-    como el procesamiento de la actualización (POST).
+    como el procesamiento de la actualización (POST/PUT).
     
     Args:
         id (str): ID del anime a actualizar
         
     Returns:
-        Response: GET - formulario de edición, POST - redirección con mensaje
+        Response: GET - formulario de edición, POST/PUT - redirección con mensaje
 """
 
-@animes.route("/update/<id>", methods=["GET", "POST"])
+@animes.route("/update/<id>", methods=["GET", "PUT"])
 def update_anime(id):
     # Buscar el anime por ID
     anime_to_update = anime.query.get(id)
@@ -188,12 +188,16 @@ def update_anime(id):
         flash("Anime no encontrado", "error")
         return redirect(url_for('animes.directory'))
 
-    if request.method == "POST":
+    if request.method == "PUT":
         # Procesar actualización del anime
         success, message = service_update_anime(id)
-        flash(message, "success" if success else "error")
-        # Redireccionar al directorio después de actualizar
-        return redirect(url_for('animes.directory'))
+        
+        # Para peticiones AJAX/JavaScript (PUT), devolver JSON
+        return jsonify({
+            'success': success, 
+            'message': message,
+            'redirect_url': url_for('animes.directory')
+        })
 
     # GET: Mostrar formulario de edición con datos actuales
     return render_template('Update.html', anime=anime_to_update)
@@ -201,8 +205,8 @@ def update_anime(id):
 """
     Endpoint para eliminar un anime.
     
-    Elimina un anime específico y redirecciona al directorio con
-    un mensaje de confirmación o error.
+    Elimina un anime específico usando el método HTTP DELETE
+    siguiendo las convenciones REST estrictas.
     
     Args:
         id (str): ID del anime a eliminar
@@ -211,13 +215,14 @@ def update_anime(id):
         Response: Redirección al directorio con mensaje flash
 """
 
-@animes.route('/delete/<id>')
+@animes.route('/delete/<id>', methods=["DELETE"])
 def delete_anime(id):
     # Llamar al servicio de eliminación
     success, message = service_delete_anime(id)
     
-    # Mostrar mensaje del resultado de la operación
-    flash(message, "success" if success else "error")
-    
-    # Redireccionar al directorio
-    return redirect(url_for('animes.directory'))
+    # Para peticiones DELETE via JavaScript, devolver JSON
+    return jsonify({
+        'success': success, 
+        'message': message,
+        'redirect_url': url_for('animes.directory')
+    })

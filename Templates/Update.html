@@ -7,7 +7,8 @@
             <div class="card bg-dark text-light mt-4">
                 <div class="card-body">
                     <h3 class="text-center mb-4">Editar Anime</h3>
-                <form action="{{ url_for('animes.update_anime', id=anime.id) }}" method="POST">    
+                <form id="updateForm" action="{{ url_for('animes.update_anime', id=anime.id) }}" method="POST">
+                    <!-- El formulario se enviará como PUT usando JavaScript -->    
                     <div class="mb-3">
                         <label class="d-block">Actualizar nombre</label>
                         <input type="text" name="name" value="{{ anime.name }}" 
@@ -64,4 +65,35 @@
         </div>
     </div>
 </div>
+
+<script>
+document.getElementById('updateForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // Prevenir el envío normal del formulario
+    
+    const form = e.target;
+    const formData = new FormData(form);
+    
+    // Enviar la petición PUT usando fetch
+    fetch(form.action, {
+        method: 'PUT',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Mostrar mensaje de éxito y redirigir
+            alert(data.message);
+            window.location.href = data.redirect_url;
+        } else {
+            // Mostrar mensaje de error
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al actualizar el anime');
+    });
+});
+</script>
+
 {% endblock %}
