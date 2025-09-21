@@ -91,8 +91,8 @@
                                 <!-- Buttons for edit and delete -->
                                 <div class="d-flex gap-2 mt-3">
                                     <a href="{{ url_for('animes.update_anime', id=anime.id) }}" class="btn btn-primary btn-sm flex-fill">Editar</a>
-                                    <button type="button" class="btn btn-danger btn-sm flex-fill" 
-                                    onclick="deleteAnime({{ anime.id }})">Eliminar</button>
+                                    <button type="button" class="btn btn-danger btn-sm flex-fill delete-btn" 
+                                    data-anime-id="{{ anime.id }}">Eliminar</button>
                                 </div>
                             </div>
                         </div>
@@ -135,6 +135,16 @@ function deleteAnime(animeId) {
         });
     }
 }
+
+// Event listener para botones de eliminar
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.delete-btn').forEach(function(button) {
+        button.addEventListener('click', function() {
+            const animeId = this.getAttribute('data-anime-id');
+            deleteAnime(animeId);
+        });
+    });
+});
 </script>
 
 {% endblock %}

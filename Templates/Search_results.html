@@ -36,8 +36,8 @@
                             </p>
                             <div class="d-flex gap-2">
                                 <a href="{{ url_for('animes.update_anime', id=anime.id) }}" class="btn btn-primary btn-sm flex-fill">Editar</a>
-                                <button type="button" class="btn btn-danger btn-sm flex-fill" 
-                                onclick="deleteAnime({{ anime.id }})">Eliminar</button>
+                                <button type="button" class="btn btn-danger btn-sm flex-fill delete-btn" 
+                                data-anime-id="{{ anime.id }}">Eliminar</button>
                             </div>
                         </div>
                     </div>
@@ -76,6 +76,16 @@
             });
         }
     }
+
+    // Event listener para botones de eliminar
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.delete-btn').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const animeId = this.getAttribute('data-anime-id');
+                deleteAnime(animeId);
+            });
+        });
+    });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
