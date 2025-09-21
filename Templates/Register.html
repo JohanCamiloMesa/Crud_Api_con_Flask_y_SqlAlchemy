@@ -1,0 +1,122 @@
+{% extends "Layout.html" %}
+
+{% block body %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card mt-5">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0 text-center">
+                        <i class="fas fa-user-plus"></i> Registro de Usuario
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Mostrar mensajes flash -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form id="registerForm" method="POST" action="{{ url_for('users.register_page') }}">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">
+                                <i class="fas fa-user"></i> Nombre de Usuario
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="username" 
+                                   name="username" 
+                                   placeholder="Ingresa tu nombre de usuario"
+                                   required 
+                                   minlength="3"
+                                   maxlength="80"
+                                   pattern="[a-zA-Z0-9_-]+"
+                                   title="Solo letras, números, guiones y guiones bajos">
+                            <div class="form-text">
+                                Mínimo 3 caracteres. Solo letras, números, guiones (-) y guiones bajos (_).
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-lock"></i> Contraseña
+                            </label>
+                            <input type="password" 
+                                   class="form-control" 
+                                   id="password" 
+                                   name="password" 
+                                   placeholder="Ingresa tu contraseña"
+                                   required 
+                                   minlength="6"
+                                   maxlength="255">
+                            <div class="form-text">
+                                Mínimo 6 caracteres.
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="confirm_password" class="form-label">
+                                <i class="fas fa-lock"></i> Confirmar Contraseña
+                            </label>
+                            <input type="password" 
+                                   class="form-control" 
+                                   id="confirm_password" 
+                                   name="confirm_password" 
+                                   placeholder="Confirma tu contraseña"
+                                   required>
+                            <div class="invalid-feedback">
+                                Las contraseñas no coinciden.
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus"></i> Registrarse
+                            </button>
+                        </div>
+                    </form>
+
+                    <hr>
+                    <div class="text-center">
+                        <p class="mb-0">¿Ya tienes cuenta?</p>
+                        <a href="{{ url_for('users.login_page') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Font Awesome para iconos -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<script>
+// Validación de contraseñas coincidentes
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirm_password').value;
+    
+    if (password !== confirmPassword) {
+        e.preventDefault();
+        document.getElementById('confirm_password').classList.add('is-invalid');
+        return false;
+    }
+    
+    document.getElementById('confirm_password').classList.remove('is-invalid');
+    return true;
+});
+
+// Limpiar validación cuando se escribe
+document.getElementById('confirm_password').addEventListener('input', function() {
+    this.classList.remove('is-invalid');
+});
+</script>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "Layout.html" %}
+
+{% block body %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card mt-5">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0 text-center">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Mostrar mensajes flash -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <form id="loginForm" method="POST" action="{{ url_for('users.login_page') }}">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">
+                                <i class="fas fa-user"></i> Nombre de Usuario
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="username" 
+                                   name="username" 
+                                   placeholder="Ingresa tu nombre de usuario"
+                                   required 
+                                   autocomplete="username">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="fas fa-lock"></i> Contraseña
+                            </label>
+                            <input type="password" 
+                                   class="form-control" 
+                                   id="password" 
+                                   name="password" 
+                                   placeholder="Ingresa tu contraseña"
+                                   required 
+                                   autocomplete="current-password">
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="remember_me" name="remember_me">
+                            <label class="form-check-label" for="remember_me">
+                                Recordarme
+                            </label>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                            </button>
+                        </div>
+                    </form>
+
+                    <hr>
+                    <div class="text-center">
+                        <p class="mb-0">¿No tienes cuenta?</p>
+                        <a href="{{ url_for('users.register_page') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-user-plus"></i> Registrarse
+                        </a>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <a href="{{ url_for('animes.home') }}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-home"></i> Volver al Inicio
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Font Awesome para iconos -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<script>
+// Agregar animación de loading al enviar el formulario
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Iniciando sesión...';
+    submitBtn.disabled = true;
+    
+    // Si hay un error, restaurar el botón después de un momento
+    setTimeout(() => {
+        if (submitBtn.disabled) {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    }, 3000);
+});
+</script>
+{% endblock %}

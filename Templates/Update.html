@@ -19,14 +19,9 @@
                     <div class="mb-3">
                         <label class="d-block">Actualizar género</label>
                         <select name="genre" class="form-control rounded-0 bg-white border-0" required>
-                            <option value="Acción" {% if anime.genre == 'Acción' %}selected{% endif %}>Acción</option>
-                            <option value="Aventura" {% if anime.genre == 'Aventura' %}selected{% endif %}>Aventura</option>
-                            <option value="Comedia" {% if anime.genre == 'Comedia' %}selected{% endif %}>Comedia</option>
-                            <option value="Drama" {% if anime.genre == 'Drama' %}selected{% endif %}>Drama</option>
-                            <option value="Terror" {% if anime.genre == 'Terror' %}selected{% endif %}>Terror</option>
-                            <option value="Romance" {% if anime.genre == 'Romance' %}selected{% endif %}>Romance</option>
-                            <option value="Ciencia Ficción" {% if anime.genre == 'Ciencia Ficción' %}selected{% endif %}>Ciencia Ficción</option>
-                            <option value="Fantasy" {% if anime.genre == 'Fantasy' %}selected{% endif %}>Fantasy</option>
+                            {% for genre in genres %}
+                            <option value="{{ genre.name }}" {% if anime.genre == genre.name %}selected{% endif %}>{{ genre.name }}</option>
+                            {% endfor %}
                         </select>
                     </div>
 

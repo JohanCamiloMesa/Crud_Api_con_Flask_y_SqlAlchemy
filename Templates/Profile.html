@@ -1,0 +1,155 @@
+{% extends "Layout.html" %}
+
+{% block body %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card mt-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user"></i> Mi Perfil
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Mostrar mensajes flash -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    {% if user %}
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <div class="card border-primary">
+                                <div class="card-body">
+                                    <i class="fas fa-user-circle fa-5x text-primary mb-3"></i>
+                                    <h5 class="card-title">{{ user.username }}</h5>
+                                    <p class="card-text text-muted">
+                                        <small>ID: {{ user.id }}</small>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-8">
+                            <h5><i class="fas fa-info-circle text-info"></i> Información del Usuario</h5>
+                            <table class="table table-striped">
+                                <tbody>
+                                    <tr>
+                                        <td><strong>ID de Usuario:</strong></td>
+                                        <td>{{ user.id }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Nombre de Usuario:</strong></td>
+                                        <td>{{ user.username }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Estado de la Cuenta:</strong></td>
+                                        <td>
+                                            <span class="badge bg-success">Activa</span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Tipo de Usuario:</strong></td>
+                                        <td>
+                                            <span class="badge bg-primary">Usuario Estándar</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h5><i class="fas fa-cogs text-warning"></i> Acciones Disponibles</h5>
+                            <div class="row">
+                                <div class="col-md-3 mb-2">
+                                    <div class="d-grid">
+                                        <a href="{{ url_for('users.dashboard') }}" class="btn btn-outline-primary">
+                                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <div class="d-grid">
+                                        <a href="{{ url_for('animes.home') }}" class="btn btn-outline-info">
+                                            <i class="fas fa-list"></i> Ver Animes
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <div class="d-grid">
+                                        <a href="{{ url_for('animes.directory') }}" class="btn btn-outline-success">
+                                            <i class="fas fa-search"></i> Buscar
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <div class="d-grid">
+                                        <a href="{{ url_for('users.logout') }}" class="btn btn-outline-danger">
+                                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-4 border-info">
+                        <div class="card-header bg-info text-white">
+                            <h6 class="mb-0">
+                                <i class="fas fa-shield-alt"></i> Permisos y Capacidades
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="text-success">✓ Permisos Concedidos:</h6>
+                                    <ul class="list-unstyled">
+                                        <li><i class="fas fa-check-circle text-success"></i> Ver animes</li>
+                                        <li><i class="fas fa-check-circle text-success"></i> Buscar animes</li>
+                                        <li><i class="fas fa-check-circle text-success"></i> Agregar nuevos animes</li>
+                                        <li><i class="fas fa-check-circle text-success"></i> Editar animes existentes</li>
+                                        <li><i class="fas fa-check-circle text-success"></i> Eliminar animes</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-info">ℹ️ Información Adicional:</h6>
+                                    <ul class="list-unstyled">
+                                        <li><i class="fas fa-info-circle text-info"></i> Acceso completo al sistema</li>
+                                        <li><i class="fas fa-info-circle text-info"></i> Sesión segura con autenticación</li>
+                                        <li><i class="fas fa-info-circle text-info"></i> Datos protegidos</li>
+                                        <li><i class="fas fa-info-circle text-info"></i> Interfaz personalizada</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-center">
+                        <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                        <h5>No se pudo cargar la información del perfil</h5>
+                        <p>Por favor, inicia sesión nuevamente.</p>
+                        <a href="{{ url_for('users.login_page') }}" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Font Awesome para iconos -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock %}

@@ -1,0 +1,279 @@
+{% extends "Layout.html" %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mt-4">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user-circle"></i> Dashboard de Usuario
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Mostrar mensajes flash -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    {% if user %}
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card border-primary">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-user-circle fa-5x text-primary mb-3"></i>
+                                    <h5 class="card-title">{{ user.username }}</h5>
+                                    <p class="card-text text-muted">Usuario ID: {{ user.id }}</p>
+                                    <p class="card-text text-muted">
+                                        <small>Cuenta creada</small>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-8">
+                            <div class="card border-success">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-cogs"></i> Acciones Disponibles
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <div class="d-grid">
+                                                <a href="{{ url_for('animes.directory') }}" class="btn btn-primary">
+                                                    <i class="fas fa-list"></i> Ver Animes
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="d-grid">
+                                                <a href="{{ url_for('animes.home') }}" class="btn btn-success">
+                                                    <i class="fas fa-plus"></i> Agregar Anime
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="d-grid">
+                                                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#authTokenModal">
+                                                    <i class="fas fa-shield-alt"></i> Autenticarse
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="d-grid">
+                                                <a href="{{ url_for('users.get_token') }}" class="btn btn-info">
+                                                    <i class="fas fa-key"></i> Obtener Token
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="d-grid">
+                                                <a href="{{ url_for('users.logout') }}" class="btn btn-danger">
+                                                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% else %}
+                    <div class="text-center">
+                        <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                        <h5>No hay información de usuario disponible</h5>
+                        <p>Por favor, inicia sesión para acceder a tu dashboard.</p>
+                        <a href="{{ url_for('users.login_page') }}" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para autenticarse con token -->
+<div class="modal fade" id="authTokenModal" tabindex="-1" aria-labelledby="authTokenModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="authTokenModalLabel">
+                    <i class="fas fa-shield-alt"></i> Autenticación con Token JWT
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Importante:</strong> Solo puedes usar TU PROPIO token JWT para eliminar animes. Cada usuario debe generar y usar su token personal.
+                </div>
+                <div class="mb-3">
+                    <label for="jwtToken" class="form-label">
+                        <i class="fas fa-key"></i> Tu Token JWT Personal
+                    </label>
+                    <textarea id="jwtToken" class="form-control" rows="4" 
+                            placeholder="Pega aquí tu token JWT completo..."></textarea>
+                    <div class="form-text">
+                        El token debe empezar con "eyJ" y ser una cadena larga sin espacios.
+                    </div>
+                </div>
+                <div id="tokenValidationMessage" class="alert" style="display: none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-warning" id="authenticateBtn">
+                    <i class="fas fa-check"></i> Autenticar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function validateAndStoreToken() {
+    console.log('=== INICIO DE VALIDACIÓN ==='); // Debug
+    
+    try {
+        const token = document.getElementById('jwtToken').value.trim();
+        console.log('Token length:', token.length); // Debug
+        
+        // Validación básica
+        if (!token) {
+            alert('Por favor ingresa un token JWT.');
+            return;
+        }
+        
+        if (!token.startsWith('eyJ')) {
+            alert('El token JWT debe empezar con "eyJ".');
+            return;
+        }
+        
+        // Validar que tenga 3 partes
+        const parts = token.split('.');
+        if (parts.length !== 3) {
+            alert('Token JWT inválido. Debe tener 3 partes separadas por puntos.');
+            return;
+        }
+        
+        try {
+            // Decodificar el payload para obtener el ID del usuario
+            const payload = JSON.parse(atob(parts[1]));
+            console.log('Payload completo:', payload); // Debug
+            
+            // Flask-JWT-Extended usa 'sub' para el identity
+            let tokenUserId = payload.sub;
+            
+            // Si no hay 'sub', intentar con otros campos comunes
+            if (!tokenUserId) {
+                tokenUserId = payload.identity || payload.user_id || payload.id;
+            }
+            
+            console.log('Token User ID extraído:', tokenUserId); // Debug
+            
+            // Guardar el token y el ID del usuario
+            localStorage.setItem('jwtToken', token);
+            localStorage.setItem('jwtTokenUserId', tokenUserId);
+            
+            console.log('Token guardado en localStorage'); // Debug
+            
+        } catch (decodeError) {
+            console.warn('No se pudo decodificar el payload, guardando token sin validación de usuario:', decodeError);
+            // Guardar el token sin validación de usuario
+            localStorage.setItem('jwtToken', token);
+            localStorage.setItem('jwtTokenUserId', '1'); // Asumir usuario 1 por defecto
+        }
+        
+        // Mostrar mensaje de éxito
+        const messageDiv = document.getElementById('tokenValidationMessage');
+        if (messageDiv) {
+            messageDiv.className = 'alert alert-success';
+            messageDiv.innerHTML = '<i class="fas fa-check-circle"></i> Token guardado exitosamente. Ahora puedes eliminar animes.';
+            messageDiv.style.display = 'block';
+        } else {
+            alert('Token guardado exitosamente!');
+        }
+        
+        console.log('=== TOKEN GUARDADO - NO CERRANDO MODAL ==='); // Debug
+        
+        // NO cerrar modal automáticamente para debugging
+        /*
+        setTimeout(() => {
+            try {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('authTokenModal'));
+                if (modal) {
+                    modal.hide();
+                }
+                document.getElementById('jwtToken').value = '';
+                if (messageDiv) {
+                    messageDiv.style.display = 'none';
+                }
+            } catch (e) {
+                console.error('Error cerrando modal:', e);
+            }
+        }, 2000);
+        */
+        
+    } catch (error) {
+        console.error('ERROR EN VALIDACIÓN:', error); // Debug
+        alert('Error: ' + error.message);
+    }
+    
+    console.log('=== FIN DE VALIDACIÓN ==='); // Debug
+}
+
+function showMessage(message, type) {
+    console.log('Mostrando mensaje:', message, 'Tipo:', type); // Debug
+    const messageDiv = document.getElementById('tokenValidationMessage');
+    if (!messageDiv) {
+        console.error('No se encontró el elemento tokenValidationMessage');
+        alert(message); // Fallback
+        return;
+    }
+    messageDiv.className = `alert alert-${type}`;
+    messageDiv.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i> ${message}`;
+    messageDiv.style.display = 'block';
+}
+
+// Función para obtener el token almacenado (para usar en otras partes de la aplicación)
+function getStoredToken() {
+    return localStorage.getItem('jwtToken');
+}
+
+// Verificar si hay un token almacenado al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    const storedToken = getStoredToken();
+    if (storedToken) {
+        console.log('Token JWT encontrado en localStorage');
+    }
+    
+    // Agregar event listener al botón de autenticar
+    const authenticateBtn = document.getElementById('authenticateBtn');
+    if (authenticateBtn) {
+        authenticateBtn.addEventListener('click', function(event) {
+            event.preventDefault(); // Prevenir comportamiento por defecto
+            event.stopPropagation(); // Detener propagación del evento
+            console.log('Botón autenticar clickeado'); // Debug
+            validateAndStoreToken();
+        });
+        console.log('Event listener agregado al botón de autenticar');
+    } else {
+        console.error('No se encontró el botón de autenticar');
+    }
+});
+</script>
+
+<!-- Font Awesome para iconos -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock %}
