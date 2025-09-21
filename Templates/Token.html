@@ -1,0 +1,123 @@
+{% extends "Layout.html" %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mt-4">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-key"></i> Token de Acceso JWT
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Mostrar mensajes flash -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card border-primary">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-user-circle fa-5x text-primary mb-3"></i>
+                                    <h5 class="card-title">{{ user.username }}</h5>
+                                    <p class="card-text text-muted">Usuario ID: {{ user.id }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-8">
+                            <div class="card border-success">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-key"></i> Tu Token JWT
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="alert alert-warning">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <strong>Importante:</strong> Guarda este token de forma segura. No lo compartas con nadie.
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="tokenText" class="form-label"><strong>Token de Acceso:</strong></label>
+                                        <div class="input-group">
+                                            <textarea id="tokenText" class="form-control" rows="4" readonly>{{ token }}</textarea>
+                                            <button class="btn btn-outline-secondary" type="button" onclick="copyToken()">
+                                                <i class="fas fa-copy"></i> Copiar
+                                            </button>
+                                        </div>
+                                        <div class="form-text">Este token te permite acceder a la API REST del sistema.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones de acción -->
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="d-grid">
+                                <a href="{{ url_for('users.dashboard') }}" class="btn btn-primary">
+                                    <i class="fas fa-arrow-left"></i> Volver al Dashboard
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-grid">
+                                <button type="button" class="btn btn-success" onclick="generateNewToken()">
+                                    <i class="fas fa-sync-alt"></i> Generar Nuevo Token
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyToken() {
+    const tokenText = document.getElementById('tokenText');
+    tokenText.select();
+    tokenText.setSelectionRange(0, 99999); // Para móviles
+    
+    try {
+        document.execCommand('copy');
+        
+        // Cambiar temporalmente el texto del botón
+        const copyBtn = event.target.closest('button');
+        const originalHTML = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<i class="fas fa-check"></i> ¡Copiado!';
+        copyBtn.classList.remove('btn-outline-secondary');
+        copyBtn.classList.add('btn-success');
+        
+        setTimeout(() => {
+            copyBtn.innerHTML = originalHTML;
+            copyBtn.classList.remove('btn-success');
+            copyBtn.classList.add('btn-outline-secondary');
+        }, 2000);
+        
+    } catch (err) {
+        console.error('Error al copiar:', err);
+        alert('No se pudo copiar el token. Por favor, selecciona y copia manualmente.');
+    }
+}
+
+function generateNewToken() {
+    if (confirm('¿Estás seguro de que quieres generar un nuevo token? El token actual dejará de funcionar.')) {
+        window.location.reload();
+    }
+}
+</script>
+
+{% endblock %}

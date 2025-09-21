@@ -1,0 +1,37 @@
+{% extends "Layout.html" %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-md-3 text-center mt-5">
+            <div class="card">
+                <div class="card-body">
+                    <i class="fas fa-sign-out-alt fa-3x text-success mb-3"></i>
+                    <h4>Cerrando sesión...</h4>
+                    <p>Limpiando datos de autenticación...</p>
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Limpiar todos los tokens almacenados en localStorage
+localStorage.removeItem('jwtToken');
+localStorage.removeItem('jwtTokenUserId');
+
+// Limpiar cualquier otro dato relacionado con la sesión
+localStorage.clear();
+
+// Redireccionar después de 2 segundos
+setTimeout(() => {
+    window.location.href = '{{ redirect_url }}';
+}, 2000);
+</script>
+
+<!-- Font Awesome para iconos -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{% endblock %}

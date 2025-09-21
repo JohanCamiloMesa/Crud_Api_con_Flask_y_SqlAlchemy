@@ -4,20 +4,22 @@
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarText">
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('animes.home') }}">Inicio</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('animes.directory') }}">Directorio</a>
-            </li>
-        </ul>
-        
         <!-- Search bar in center -->
-        <form class="d-flex mx-auto" method="GET" action="{{ url_for('animes.search') }}" style="width: 900px;">
+        <form class="d-flex mx-auto" method="GET" action="{{ url_for('animes.search') }}" style="width: 600px;">
             <input class="form-control me-2" type="search" name="query" placeholder="Buscar anime por nombre" aria-label="Search">
             <button class="btn btn-outline-light" type="submit">Buscar</button>
         </form>
+        
+        <!-- Authentication links - Solo mostrar si está autenticado -->
+        {% if session.get('is_authenticated') %}
+        <ul class="navbar-nav me-3">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('users.dashboard') }}">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            </li>
+        </ul>
+        {% endif %}
         
         <span class="navbar-text">
             Realizado por: Johan Camilo Mesa

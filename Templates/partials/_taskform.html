@@ -1,4 +1,9 @@
+{% if session.get('is_authenticated') %}
 <form action="/new" method="post" class="card bg-dark text-light" style="margin-left: 20px; max-width: 400px;">
+    <div class="card-header text-center">
+        <h5><i class="fas fa-plus-circle"></i> Agregar Nuevo Anime</h5>
+        <small class="text-muted">Usuario: {{ session.get('username') }}</small>
+    </div>
     <div class="card-body p-4">
         <div class="mb-3">
             <label for="name">Nombre del Anime</label>
@@ -10,14 +15,9 @@
             <label for="genre">Género</label>
             <select name="genre" class="form-control rounded-0 bg-light border-0" required>
                 <option value="">Selecciona un género</option>
-                <option value="Acción">Acción</option>
-                <option value="Aventura">Aventura</option>
-                <option value="Comedia">Comedia</option>
-                <option value="Drama">Drama</option>
-                <option value="Terror">Terror</option>
-                <option value="Romance">Romance</option>
-                <option value="Ciencia Ficción">Ciencia Ficción</option>
-                <option value="Fantasy">Fantasy</option>
+                {% for genre in genres %}
+                <option value="{{ genre.name }}">{{ genre.name }}</option>
+                {% endfor %}
             </select>
         </div>
 
@@ -50,7 +50,29 @@
         </div>
 
         <div class="text-center">
-            <button type="submit" class="btn btn-primary">Guardar Anime</button>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Guardar Anime
+            </button>
         </div>
     </div>
 </form>
+{% else %}
+<div class="card bg-warning text-dark" style="margin-left: 20px; max-width: 400px;">
+    <div class="card-body text-center p-4">
+        <i class="fas fa-lock fa-3x mb-3"></i>
+        <h5>Autenticación Requerida</h5>
+        <p class="mb-3">Para agregar animes necesitas iniciar sesión.</p>
+        <div class="d-grid gap-2">
+            <a href="{{ url_for('users.login_page') }}" class="btn btn-success">
+                <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+            </a>
+            <a href="{{ url_for('users.register_page') }}" class="btn btn-outline-primary">
+                <i class="fas fa-user-plus"></i> Registrarse
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Font Awesome para iconos -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
