@@ -17,3 +17,11 @@ class Category(db.Model):
     name = Column(String(255), nullable=False)
     anime_id = Column(Integer, ForeignKey('Animes.id'))
     animes = relationship('anime', backref='category')
+
+class GenreCategory(db.Model):
+    __tablename__ = 'genrecategories'
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), nullable=False, unique=True)
+    
+    def __repr__(self):
+        return f'<GenreCategory {self.name}>'

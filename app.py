@@ -1,8 +1,10 @@
 from flask import Flask 
 from Controller.animes_controller import animes
+from Controller.user_controller import users
 from Utils.database import db
 from Config.db_config import DATABASE_CONNECTION_URI
 from flask import redirect, url_for
+from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
 
@@ -11,11 +13,16 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_CONNECTION_URI
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = "mysecretkey"
 
+# Configure JWT
+app.config['JWT_SECRET_KEY'] = 'tu_clave_secreta_super_segura_jwt_cambiar_en_produccion'
+jwt = JWTManager(app)
+
 # Initialize SQLAlchemy with app
 db.init_app(app)
 
 # Register blueprints
 app.register_blueprint(animes)
+app.register_blueprint(users)
 
 @app.errorhandler(404)
 def page_not_found(e):

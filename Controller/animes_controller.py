@@ -1,5 +1,6 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
-from Models.anime_model import anime
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from Models.anime_model import anime, GenreCategory
 from Services.anime_service import (
     create_anime as service_create_anime,
     update_anime as service_update_anime,
@@ -11,7 +12,8 @@ animes = Blueprint('animes', __name__)
 @animes.route("/")
 def home():
     animes_list = anime.query.all()
-    return render_template("Index.html", animes=animes_list)
+    genres = GenreCategory.query.all()
+    return render_template("Index.html", animes=animes_list, genres=genres)
 
 @animes.route("/directory")
 def directory():
@@ -96,10 +98,43 @@ def update_anime(id):
         flash(message, "success" if success else "error")
         return redirect(url_for('animes.directory'))
 
-    return render_template('Update.html', anime=anime_to_update)
+    genres = GenreCategory.query.all()
+    return render_template('Update.html', anime=anime_to_update, genres=genres)
 
 @animes.route('/delete/<id>')
 def delete_anime(id):
-    success, message = service_delete_anime(id)
-    flash(message, "success" if success else "error")
-    return redirect(url_for('animes.directory'))
+    # Redirect to authentication page instead of directly deleting
+    flash("Para eliminar un anime, debes autenticarte con tu token JWT.", "error")
+    return redirect(url_for('users.dashboard'))
+
+@animes.route('/api/delete/<int:id>', methods=['DELETE'])
+@jwt_required()
+def api_delete_anime(id):
+    """
+    Endpoint API protegido para eliminar anime con autenticación JWT
+    """
+    try:
+        current_user_id = get_jwt_identity()
+        print(f"API Delete: Usuario {current_user_id} intentando eliminar anime {id}")  # Debug
+        
+        success, message = service_delete_anime(id)
+        print(f"API Delete: Resultado del servicio: {success}, {message}")  # Debug
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'message': message,
+                'deleted_by_user': current_user_id
+            }), 200
+        else:
+            return jsonify({
+                'success': False,
+                'message': message
+            }), 400
+            
+    except Exception as e:
+        print(f"API Delete: Excepción: {str(e)}")  # Debug
+        return jsonify({
+            'success': False,
+            'message': f'Error de autenticación: {str(e)}'
+        }), 401

@@ -91,9 +91,9 @@
                                 <!-- Buttons for edit and delete -->
                                 <div class="d-flex gap-2 mt-3">
                                     <a href="{{ url_for('animes.update_anime', id=anime.id) }}" class="btn btn-primary btn-sm flex-fill">Editar</a>
-                                    <a href="{{ url_for('animes.delete_anime', id=anime.id) }}" 
-                                    class="btn btn-danger btn-sm flex-fill"
-                                    onclick="return confirm('¿Estás seguro de que quieres eliminar este anime?')">Eliminar</a>
+                                    <button class="btn btn-danger btn-sm flex-fill" onclick="deleteAnimeWithAuth({{ anime.id }}, '{{ anime.name }}')">
+                                        <i class="fas fa-trash"></i> Eliminar
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -108,5 +108,50 @@
         </div>
     </div>
 </div>
+
+<script>
+function deleteAnimeWithAuth(animeId, animeName) {
+    // Verificar si hay un token JWT guardado
+    const jwtToken = localStorage.getItem('jwtToken');
+    
+    if (!jwtToken) {
+        alert('Para eliminar un anime, debes autenticarte primero con tu token JWT.\n\nVe al Dashboard para ingresar tu token.');
+        window.location.href = "{{ url_for('users.dashboard') }}";
+        return;
+    }
+    
+    // Confirmar eliminación
+    if (!confirm(`¿Estás seguro de que quieres eliminar el anime "${animeName}"?`)) {
+        return;
+    }
+    
+    // Realizar petición DELETE con autenticación JWT
+    fetch(`/api/delete/${animeId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${jwtToken}`,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            // Recargar la página para mostrar los cambios
+            window.location.reload();
+        } else {
+            alert(`Error: ${data.message}`);
+            // Si hay error de autenticación, redirigir al dashboard
+            if (data.message.includes('autenticación')) {
+                window.location.href = "{{ url_for('users.dashboard') }}";
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al eliminar el anime. Verifica tu conexión e intenta de nuevo.');
+    });
+}
+</script>
 
 {% endblock %}

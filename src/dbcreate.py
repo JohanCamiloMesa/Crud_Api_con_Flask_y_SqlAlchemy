@@ -1,25 +1,27 @@
-import mysql.connector
+import pymysql
 from Config.db_config import user, password, host, database
 
 def init_database():
     try:
         # Primero intentamos conectar a la base de datos existente
         try:
-            conn = mysql.connector.connect(
+            conn = pymysql.connect(
                 host=host,
                 user=user,
                 password=password,
-                database=database
+                database=database,
+                charset='utf8mb4'
             )
             print(f"Database '{database}' already exists!")
             return  # Si la conexión es exitosa, la base de datos ya existe
-        except mysql.connector.Error as err:
-            if err.errno == mysql.connector.errorcode.ER_BAD_DB_ERROR:
+        except pymysql.Error as err:
+            if err.args[0] == 1049:  # Unknown database error code
                 # La base de datos no existe, la crearemos
-                conn = mysql.connector.connect(
+                conn = pymysql.connect(
                     host=host,
                     user=user,
-                    password=password
+                    password=password,
+                    charset='utf8mb4'
                 )
                 cursor = conn.cursor()
                 cursor.execute(f"CREATE DATABASE IF NOT EXISTS {database}")
@@ -28,7 +30,7 @@ def init_database():
                 # Otro tipo de error
                 raise
 
-    except mysql.connector.Error as err:
+    except pymysql.Error as err:
         print(f"Error: {err}")
         raise
 

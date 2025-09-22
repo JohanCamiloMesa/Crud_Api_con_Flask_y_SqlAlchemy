@@ -12,7 +12,7 @@ database = os.getenv('MYSQL_DB')
 
 # Usar PyMySQL como driver y soportar variables de entorno
 if user and password and host and database:
-	DATABASE_CONNECTION_URI = f"mysql://{user}:{password}@{host}/{database}"
+	DATABASE_CONNECTION_URI = f"mysql+pymysql://{user}:{password}@{host}/{database}?charset=utf8mb4"
 else:
 	# fallback a conexión directa si no hay variables de entorno
 	DATABASE_CONNECTION_URI = os.getenv('DATABASE_URI')
