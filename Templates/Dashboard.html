@@ -56,7 +56,7 @@
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <div class="d-grid">
-                                                <a href="{{ url_for('animes.home') }}" class="btn btn-success">
+                                                <a href="{{ url_for('animes.add_anime') }}" class="btn btn-success">
                                                     <i class="fas fa-plus"></i> Agregar Anime
                                                 </a>
                                             </div>
@@ -70,9 +70,9 @@
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <div class="d-grid">
-                                                <a href="{{ url_for('users.get_token') }}" class="btn btn-info">
+                                                <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#generateTokenModal">
                                                     <i class="fas fa-key"></i> Obtener Token
-                                                </a>
+                                                </button>
                                             </div>
                                         </div>
                                         <div class="col-md-6 mb-3">
@@ -80,6 +80,117 @@
                                                 <a href="{{ url_for('users.logout') }}" class="btn btn-danger">
                                                     <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
                                                 </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información de Token JWT -->
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card border-success">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-info-circle"></i> Información de Token
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <!-- Estado sin token -->
+                                    <div id="tokenInfoNoToken">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="card bg-light">
+                                                    <div class="card-body text-center">
+                                                        <i class="fas fa-clock text-muted fa-2x mb-2"></i>
+                                                        <h6 class="text-muted">Duración</h6>
+                                                        <p class="mb-0 text-muted"><strong>No hay token</strong></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="card bg-light">
+                                                    <div class="card-body text-center">
+                                                        <i class="fas fa-ban text-muted fa-2x mb-2"></i>
+                                                        <h6 class="text-muted">Estado</h6>
+                                                        <p class="mb-0 text-muted"><strong>Inactivo</strong></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="card bg-light">
+                                                    <div class="card-body text-center">
+                                                        <i class="fas fa-lock text-muted fa-2x mb-2"></i>
+                                                        <h6 class="text-muted">Autenticado</h6>
+                                                        <p class="mb-0 text-muted"><strong>No</strong></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3">
+                                            <div class="alert alert-info">
+                                                <i class="fas fa-lightbulb"></i>
+                                                <strong>Consejo:</strong> Genera tu token JWT usando el botón "Obtener Token" para activar las funciones protegidas y poder eliminar animes.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Estado con token activo -->
+                                    <div id="tokenInfoActive" style="display: none;">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="card bg-light">
+                                                    <div class="card-body text-center">
+                                                        <i class="fas fa-clock text-warning fa-2x mb-2"></i>
+                                                        <h6>Duración</h6>
+                                                        <p class="mb-0"><strong>1 hora</strong></p>
+                                                        <small class="text-muted">Tiempo restante: <span id="tokenTimeLeft">Calculando...</span></small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="card bg-light">
+                                                    <div class="card-body text-center">
+                                                        <i class="fas fa-shield-alt fa-2x mb-2" id="tokenStatusIcon"></i>
+                                                        <h6>Estado</h6>
+                                                        <p class="mb-0"><strong><span id="tokenStatus">Activo</span></strong></p>
+                                                        <small class="text-muted">Creado: <span id="tokenCreatedAt">-</span></small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="card bg-light">
+                                                    <div class="card-body text-center">
+                                                        <i class="fas fa-user-check fa-2x mb-2" id="authStatusIcon"></i>
+                                                        <h6>Autenticado</h6>
+                                                        <p class="mb-0"><strong><span id="authStatus">Verificando...</span></strong></p>
+                                                        <small class="text-muted">Para eliminar animes</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3">
+                                            <div class="alert alert-info">
+                                                <i class="fas fa-info-circle"></i>
+                                                <strong>Token generado!</strong> Para eliminar animes, debes autenticarte manualmente usando el botón "Autenticarse" e ingresando tu token.
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Acciones de token -->
+                                        <div class="mt-3">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <button class="btn btn-outline-primary w-100" onclick="refreshTokenStatus()">
+                                                        <i class="fas fa-sync-alt"></i> Verificar Estado
+                                                    </button>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <button class="btn btn-danger w-100" onclick="deleteToken()">
+                                                        <i class="fas fa-trash-alt"></i> Eliminar Token
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -117,16 +228,20 @@
             <div class="modal-body">
                 <div class="alert alert-warning">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <strong>Importante:</strong> Solo puedes usar TU PROPIO token JWT para eliminar animes. Cada usuario debe generar y usar su token personal.
+                    <strong>🔐 SEGURIDAD INDIVIDUAL POR USUARIO:</strong><br>
+                    • Solo puedes usar tokens generados por TU cuenta ({{ user.username }} - ID: {{ user.id }})<br>
+                    • Los tokens de otros usuarios serán automáticamente RECHAZADOS<br>
+                    • El sistema verifica que el token pertenezca a tu usuario específico<br>
+                    • Si no tienes token, usa el botón "Obtener Token" para generar uno nuevo
                 </div>
                 <div class="mb-3">
                     <label for="jwtToken" class="form-label">
-                        <i class="fas fa-key"></i> Tu Token JWT Personal
+                        <i class="fas fa-key"></i> Tu Token JWT Personal (Usuario: {{ user.username }})
                     </label>
                     <textarea id="jwtToken" class="form-control" rows="4" 
-                            placeholder="Pega aquí tu token JWT completo..."></textarea>
+                            placeholder="Pega aquí SOLO tu token JWT personal generado para {{ user.username }}..."></textarea>
                     <div class="form-text">
-                        El token debe empezar con "eyJ" y ser una cadena larga sin espacios.
+                        <i class="fas fa-info-circle"></i> El token debe empezar con "eyJ" y contener tu ID de usuario ({{ user.id }}) en su información interna.
                     </div>
                 </div>
                 <div id="tokenValidationMessage" class="alert" style="display: none;"></div>
@@ -136,6 +251,94 @@
                 <button type="button" class="btn btn-warning" id="authenticateBtn">
                     <i class="fas fa-check"></i> Autenticar
                 </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para generar y mostrar token -->
+<div class="modal fade" id="generateTokenModal" tabindex="-1" aria-labelledby="generateTokenModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="generateTokenModalLabel">
+                    <i class="fas fa-key"></i> Tu Token JWT Personal
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Estado inicial: No hay token -->
+                <div id="noTokenModalSection">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-lock fa-3x text-muted mb-3"></i>
+                        <h5>Generar Token JWT</h5>
+                        <p class="text-muted">Haz clic en el botón para generar tu token personal de 1 hora de duración.</p>
+                    </div>
+                    <div class="d-grid">
+                        <button class="btn btn-info btn-lg" onclick="generateTokenInModal()">
+                            <i class="fas fa-key"></i> Generar Token Ahora
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Estado: Token generado -->
+                <div id="tokenGeneratedSection" style="display: none;">
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i>
+                        <strong>¡Token generado exitosamente!</strong> Tu token JWT está listo para usar.
+                    </div>
+                    
+                    <!-- Token display -->
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-key"></i> <strong>Tu Token JWT:</strong>
+                        </label>
+                        <div class="input-group">
+                            <textarea 
+                                id="modalTokenDisplay" 
+                                class="form-control" 
+                                rows="5" 
+                                readonly 
+                                style="font-family: monospace; font-size: 12px; background-color: #f8f9fa; border: 2px solid #28a745;">
+                            </textarea>
+                            <button class="btn btn-success" type="button" onclick="copyTokenFromModal()" title="Copiar token">
+                                <i class="fas fa-copy"></i> Copiar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Información adicional -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-clock text-warning fa-2x mb-2"></i>
+                                    <h6>Duración</h6>
+                                    <p class="mb-0"><strong>1 hora</strong></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-shield-alt text-success fa-2x mb-2"></i>
+                                    <h6>Estado</h6>
+                                    <p class="mb-0"><strong>Activo</strong></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Importante:</strong> Copia este token y úsalo en la sección "Autenticarse" para validar tu acceso a funciones protegidas.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
@@ -182,17 +385,39 @@ function validateAndStoreToken() {
             
             console.log('Token User ID extraído:', tokenUserId); // Debug
             
-            // Guardar el token y el ID del usuario
+            // *** VALIDACIÓN CRÍTICA: Verificar que el token pertenece al usuario actual ***
+            const currentUserId = '{{ user.id }}'; // ID del usuario actual de la sesión
+            console.log('Usuario actual de sesión:', currentUserId); // Debug
+            
+            if (!tokenUserId) {
+                alert('❌ ERROR: No se pudo extraer el ID de usuario del token.\n\n' +
+                      '🔍 El token parece estar malformado o no contiene información de usuario.\n' +
+                      '🆕 Genera un nuevo token usando el botón "Obtener Token".');
+                return;
+            }
+            
+            if (tokenUserId !== currentUserId) {
+                alert('🚫 ERROR: TOKEN NO VÁLIDO PARA TU USUARIO\n\n' +
+                      '❌ Este token pertenece al usuario ID: ' + tokenUserId + '\n' +
+                      '✅ Tu usuario ID actual es: ' + currentUserId + '\n\n' +
+                      '🔐 SEGURIDAD: Solo puedes usar tokens generados por TU cuenta.\n' +
+                      '🆕 Genera tu propio token usando el botón "Obtener Token".');
+                return;
+            }
+            
+            // Token válido y pertenece al usuario correcto
             localStorage.setItem('jwtToken', token);
             localStorage.setItem('jwtTokenUserId', tokenUserId);
             
-            console.log('Token guardado en localStorage'); // Debug
+            console.log('✅ Token válido guardado para usuario:', tokenUserId); // Debug
             
         } catch (decodeError) {
-            console.warn('No se pudo decodificar el payload, guardando token sin validación de usuario:', decodeError);
-            // Guardar el token sin validación de usuario
-            localStorage.setItem('jwtToken', token);
-            localStorage.setItem('jwtTokenUserId', '1'); // Asumir usuario 1 por defecto
+            console.error('Error al decodificar token:', decodeError);
+            alert('❌ ERROR: Token JWT inválido o malformado\n\n' +
+                  '🔍 No se pudo decodificar la información del token.\n' +
+                  '📋 Verifica que hayas copiado el token completo y sin espacios.\n' +
+                  '🆕 Si el problema persiste, genera un nuevo token.');
+            return;
         }
         
         // Mostrar mensaje de éxito
@@ -204,6 +429,9 @@ function validateAndStoreToken() {
         } else {
             alert('Token guardado exitosamente!');
         }
+        
+        // Actualizar el estado de autenticación en la información de token
+        updateTokenInfo();
         
         console.log('=== TOKEN GUARDADO - NO CERRANDO MODAL ==='); // Debug
         
@@ -253,8 +481,41 @@ function getStoredToken() {
 
 // Verificar si hay un token almacenado al cargar la página
 document.addEventListener('DOMContentLoaded', function() {
+    // === VALIDACIÓN CRÍTICA DE SEGURIDAD ===
+    // Verificar que cualquier token existente pertenezca al usuario actual
+    console.log('🔐 DASHBOARD: Verificando seguridad de tokens existentes');
+    
     const storedToken = getStoredToken();
-    if (storedToken) {
+    const storedUserId = localStorage.getItem('jwtTokenUserId');
+    const currentUserId = '{{ user.id }}';
+    
+    if (storedToken && storedUserId) {
+        console.log('Token encontrado - Validando propietario...');
+        console.log('Token User ID:', storedUserId);
+        console.log('Current User ID:', currentUserId);
+        
+        if (storedUserId !== currentUserId) {
+            console.warn('🚫 SEGURIDAD: Token pertenece a otro usuario - ELIMINANDO');
+            
+            // Limpiar COMPLETAMENTE todos los tokens del usuario anterior
+            localStorage.removeItem('jwtToken');
+            localStorage.removeItem('jwtTokenUserId');
+            localStorage.removeItem('jwtRefreshToken');
+            localStorage.removeItem('jwtTokenExpirationTime');
+            localStorage.removeItem('jwtExpiresIn');
+            localStorage.removeItem('jwtTokenCreatedAt');
+            
+            // Mostrar alerta de seguridad
+            alert('🔐 SEGURIDAD: Se eliminó un token de otro usuario\n\n' +
+                  '❌ Token anterior pertenecía al usuario ID: ' + storedUserId + '\n' +
+                  '✅ Tu usuario actual es ID: ' + currentUserId + '\n\n' +
+                  '🛡️ Por seguridad, debes generar tu propio token.');
+            
+            console.log('✅ SEGURIDAD: Tokens de otro usuario eliminados correctamente');
+        } else {
+            console.log('✅ Token válido para usuario actual');
+        }
+    } else if (storedToken) {
         console.log('Token JWT encontrado en localStorage');
     }
     
@@ -270,6 +531,624 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Event listener agregado al botón de autenticar');
     } else {
         console.error('No se encontró el botón de autenticar');
+    }
+    
+    // Inicializar información de token
+    initializeTokenInfo();
+});
+
+// Función para decodificar JWT (solo el payload, sin verificación)
+function decodeJWT(token) {
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+    } catch (error) {
+        console.error('Error decodificando JWT:', error);
+        return null;
+    }
+}
+
+// Función initializeTokenStatus eliminada - ya no se necesita
+
+// Funciones de gestión de token eliminadas - ya no se necesitan
+
+function generateToken() {
+    fetch('/users/generate-token', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.access_token) {
+            // Decodificar el token para obtener su tiempo real de expiración
+            const decodedToken = decodeJWT(data.access_token);
+            if (decodedToken && decodedToken.exp) {
+                const tokenExpirationTime = decodedToken.exp * 1000;
+                
+                // Guardar en localStorage
+                localStorage.setItem('jwtToken', data.access_token);
+                localStorage.setItem('jwtRefreshToken', data.refresh_token);
+                localStorage.setItem('jwtTokenExpirationTime', tokenExpirationTime);
+                localStorage.setItem('jwtExpiresIn', data.expires_in);
+                localStorage.setItem('jwtTokenCreatedAt', data.token_created_at);
+                
+                console.log('Token generado y guardado exitosamente');
+            } else {
+                console.error('Error: No se pudo decodificar el token');
+            }
+        } else {
+            console.error('Error al generar token:', data.error || 'Error desconocido');
+        }
+    })
+    .catch(error => {
+        console.error('Error al generar token:', error.message);
+    });
+}
+
+// === FUNCIONES PARA INFORMACIÓN DE TOKEN ===
+
+function updateTokenInfo() {
+    const token = localStorage.getItem('jwtToken');
+    const tokenExpirationTime = localStorage.getItem('jwtTokenExpirationTime');
+    const tokenCreatedAt = localStorage.getItem('jwtTokenCreatedAt');
+    
+    if (token && tokenExpirationTime) {
+        // Mostrar sección activa
+        showTokenInfoActive();
+        
+        // Actualizar tiempo restante
+        updateTokenTimeLeft();
+        
+        // Actualizar fecha de creación
+        if (tokenCreatedAt) {
+            const date = new Date(tokenCreatedAt);
+            document.getElementById('tokenCreatedAt').textContent = date.toLocaleString();
+        }
+        
+        // Verificar autenticación para eliminar animes
+        checkAuthenticationStatus();
+        
+        // Iniciar contador si no existe
+        if (!window.tokenInfoInterval) {
+            window.tokenInfoInterval = setInterval(updateTokenTimeLeft, 1000);
+        }
+    } else {
+        // Mostrar sección sin token
+        showTokenInfoNoToken();
+        
+        // Limpiar contador si existe
+        if (window.tokenInfoInterval) {
+            clearInterval(window.tokenInfoInterval);
+            window.tokenInfoInterval = null;
+        }
+    }
+}
+
+function showTokenInfoActive() {
+    document.getElementById('tokenInfoNoToken').style.display = 'none';
+    document.getElementById('tokenInfoActive').style.display = 'block';
+}
+
+function showTokenInfoNoToken() {
+    document.getElementById('tokenInfoNoToken').style.display = 'block';
+    document.getElementById('tokenInfoActive').style.display = 'none';
+}
+
+function updateTokenTimeLeft() {
+    const tokenExpirationTime = localStorage.getItem('jwtTokenExpirationTime');
+    const token = localStorage.getItem('jwtToken');
+    
+    if (!token || !tokenExpirationTime) {
+        document.getElementById('tokenTimeLeft').textContent = 'No disponible';
+        document.getElementById('tokenStatus').textContent = 'Inactivo';
+        document.getElementById('tokenStatusIcon').className = 'fas fa-ban text-muted fa-2x mb-2';
+        return;
+    }
+    
+    const now = new Date().getTime();
+    const expirationTime = parseInt(tokenExpirationTime);
+    const remainingMs = expirationTime - now;
+    const remaining = Math.floor(remainingMs / 1000);
+    
+    if (remaining > 0) {
+        const hours = Math.floor(remaining / 3600);
+        const minutes = Math.floor((remaining % 3600) / 60);
+        const seconds = remaining % 60;
+        
+        document.getElementById('tokenTimeLeft').textContent = 
+            `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        document.getElementById('tokenStatus').textContent = 'Activo';
+        document.getElementById('tokenStatusIcon').className = 'fas fa-shield-alt text-success fa-2x mb-2';
+    } else {
+        document.getElementById('tokenTimeLeft').textContent = 'Expirado';
+        document.getElementById('tokenStatus').textContent = 'Expirado';
+        document.getElementById('tokenStatusIcon').className = 'fas fa-times-circle text-danger fa-2x mb-2';
+        
+        // Token expirado, mostrar sección sin token
+        showTokenInfoNoToken();
+        
+        // Limpiar localStorage del token expirado
+        localStorage.removeItem('jwtToken');
+        localStorage.removeItem('jwtRefreshToken');
+        localStorage.removeItem('jwtTokenExpirationTime');
+        localStorage.removeItem('jwtExpiresIn');
+        localStorage.removeItem('jwtTokenCreatedAt');
+    }
+}
+
+// Verificar si el usuario está autenticado para eliminar animes
+function checkAuthenticationStatus() {
+    const token = localStorage.getItem('jwtToken');
+    const tokenUserId = localStorage.getItem('jwtTokenUserId');
+    
+    if (!token) {
+        updateAuthStatus('No', 'fas fa-lock text-muted fa-2x mb-2');
+        return;
+    }
+    
+    // Verificar si el usuario se ha autenticado manualmente
+    // Solo se considera autenticado si existe jwtTokenUserId (guardado en validateAndStoreToken)
+    if (!tokenUserId) {
+        // Tiene token pero no se ha autenticado manualmente
+        updateAuthStatus('No', 'fas fa-user-times text-warning fa-2x mb-2');
+        console.log('Token disponible pero usuario no se ha autenticado manualmente');
+        return;
+    }
+    
+    // Verificar que el token sigue siendo válido en el servidor
+    updateAuthStatus('Verificando...', 'fas fa-spinner fa-spin text-info fa-2x mb-2');
+    
+    fetch('/users/protected', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        } else {
+            throw new Error('Token inválido');
+        }
+    })
+    .then(data => {
+        // Token válido Y usuario autenticado manualmente
+        updateAuthStatus('Sí', 'fas fa-user-check text-success fa-2x mb-2');
+        console.log('Usuario completamente autenticado para eliminar animes');
+    })
+    .catch(error => {
+        // Token inválido, limpiar autenticación
+        localStorage.removeItem('jwtTokenUserId');
+        updateAuthStatus('No', 'fas fa-user-times text-danger fa-2x mb-2');
+        console.log('Token inválido, autenticación removida:', error.message);
+    });
+}
+
+function updateAuthStatus(status, iconClass) {
+    const authStatusElement = document.getElementById('authStatus');
+    const authIconElement = document.getElementById('authStatusIcon');
+    
+    if (authStatusElement) {
+        authStatusElement.textContent = status;
+    }
+    
+    if (authIconElement) {
+        authIconElement.className = iconClass;
+    }
+}
+
+// Inicializar información de token cuando se carga la página
+function initializeTokenInfo() {
+    updateTokenInfo();
+}
+
+// === FUNCIONES DE GESTIÓN DE TOKEN ===
+
+function deleteToken() {
+    // Confirmación de eliminación
+    if (confirm('⚠️ ¿Estás seguro de que quieres eliminar el token?\n\n' +
+                '• Se borrará completamente del sistema\n' +
+                '• No podrás autenticarte con este token\n' +
+                '• Tendrás que generar uno nuevo\n\n' +
+                '¿Continuar?')) {
+        
+        try {
+            // Limpiar todo el localStorage relacionado con JWT
+            localStorage.removeItem('jwtToken');
+            localStorage.removeItem('jwtRefreshToken');
+            localStorage.removeItem('jwtTokenExpirationTime');
+            localStorage.removeItem('jwtExpiresIn');
+            localStorage.removeItem('jwtTokenCreatedAt');
+            localStorage.removeItem('jwtTokenUserId');
+            
+            // Limpiar contador de tiempo si existe
+            if (window.tokenInfoInterval) {
+                clearInterval(window.tokenInfoInterval);
+                window.tokenInfoInterval = null;
+            }
+            
+            // Actualizar interfaz inmediatamente
+            updateTokenInfo();
+            
+            // Mostrar confirmación
+            alert('🗑️ Token eliminado exitosamente!\n\n' +
+                  '✅ Ya no existe en el sistema\n' +
+                  '🔒 No se puede usar para autenticarse\n' +
+                  '🆕 Puedes generar uno nuevo cuando lo necesites');
+            
+            console.log('Token eliminado completamente del sistema');
+            
+        } catch (error) {
+            console.error('Error al eliminar token:', error);
+            alert('❌ Error al eliminar el token: ' + error.message);
+        }
+    }
+}
+
+function refreshTokenStatus() {
+    // Verificar estado actual del token
+    const token = localStorage.getItem('jwtToken');
+    
+    if (!token) {
+        alert('ℹ️ No hay token para verificar\n\n' +
+              '💡 Genera un nuevo token usando el botón "Obtener Token"');
+        return;
+    }
+    
+    // Mostrar estado de verificación
+    updateAuthStatus('Verificando...', 'fas fa-spinner fa-spin text-info fa-2x mb-2');
+    
+    // Verificar contra el servidor
+    fetch('/users/protected', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        } else if (response.status === 401) {
+            throw new Error('Token expirado o inválido');
+        } else {
+            throw new Error('Error del servidor');
+        }
+    })
+    .then(data => {
+        // Token válido
+        const tokenUserId = localStorage.getItem('jwtTokenUserId');
+        const authStatus = tokenUserId ? 'autenticado para eliminar animes' : 'válido pero no autenticado para eliminar';
+        
+        alert('✅ Estado del token:\n\n' +
+              '🔑 Token: Válido\n' +
+              '🔐 Autenticación: ' + (tokenUserId ? 'Sí' : 'No') + '\n' +
+              '📝 Estado: ' + authStatus);
+        
+        // Actualizar información
+        updateTokenInfo();
+    })
+    .catch(error => {
+        // Token inválido o expirado
+        alert('❌ Estado del token:\n\n' +
+              '🔑 Token: Inválido/Expirado\n' +
+              '🔐 Autenticación: No\n' +
+              '⚠️ Error: ' + error.message + '\n\n' +
+              '💡 Elimina este token y genera uno nuevo');
+        
+        // Actualizar estado visual
+        updateAuthStatus('No', 'fas fa-user-times text-danger fa-2x mb-2');
+    });
+}
+
+// Función updateTokenTimeLeft eliminada - ya no se necesita
+
+function checkTokenStatus() {
+    const token = localStorage.getItem('jwtToken');
+    if (!token) {
+        alert('No se encontró token JWT');
+        return;
+    }
+    
+    fetch('/users/token-status', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.token_valid) {
+            alert('Token válido ✅');
+        } else {
+            alert('Token inválido ❌');
+        }
+    })
+    .catch(error => {
+        alert('Error al verificar token: ' + error.message);
+    });
+}
+
+function refreshToken() {
+    const refreshToken = localStorage.getItem('jwtRefreshToken');
+    if (!refreshToken) {
+        alert('No se encontró refresh token');
+        return;
+    }
+    
+    fetch('/users/refresh', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${refreshToken}`,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.access_token) {
+            // Decodificar el nuevo token para obtener su tiempo real de expiración
+            const decodedToken = decodeJWT(data.access_token);
+            if (decodedToken && decodedToken.exp) {
+                const tokenExpirationTime = decodedToken.exp * 1000;
+                
+                localStorage.setItem('jwtToken', data.access_token);
+                localStorage.setItem('jwtTokenExpirationTime', tokenExpirationTime);
+                localStorage.setItem('jwtExpiresIn', data.expires_in);
+                
+                // Mostrar el nuevo token
+                displayTokenInTextarea(data.access_token);
+                updateTokenTimeLeft();
+                alert('✅ Token renovado exitosamente!\n📋 El nuevo token está listo para usar.');
+            } else {
+                alert('Error: No se pudo decodificar el nuevo token');
+            }
+        } else {
+            alert('Error al renovar token: ' + data.error);
+        }
+    })
+    .catch(error => {
+        alert('Error al renovar token: ' + error.message);
+    });
+}
+
+// Función de debug para forzar mostrar token
+function forceShowToken() {
+    const token = localStorage.getItem('jwtToken');
+    console.log('Forzando mostrar token:', token ? 'Token encontrado' : 'No hay token');
+    
+    if (token) {
+        showActiveTokenSection();
+        setTimeout(() => {
+            displayTokenInTextarea(token);
+            console.log('Token forzado a mostrar');
+        }, 200);
+    } else {
+        alert('No hay token guardado para mostrar');
+    }
+}
+
+function copyTokenToClipboard() {
+    const token = localStorage.getItem('jwtToken');
+    if (!token) {
+        alert('No se encontró token JWT');
+        return;
+    }
+    
+    navigator.clipboard.writeText(token).then(() => {
+        alert('Token copiado al portapapeles ✅');
+    }).catch(err => {
+        // Fallback para navegadores más antiguos
+        const textArea = document.createElement('textarea');
+        textArea.value = token;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        alert('Token copiado al portapapeles ✅');
+    });
+}
+
+// === FUNCIONES PARA EL MODAL DE GENERAR TOKEN ===
+
+function generateTokenInModal() {
+    // Prevenir múltiples clics mientras está generando
+    const generateBtn = event.target;
+    
+    // Si ya está deshabilitado, no hacer nada
+    if (generateBtn.disabled) {
+        console.log('Token ya está siendo generado, esperando...');
+        return;
+    }
+    
+    // Mostrar loading y deshabilitar botón
+    const originalHTML = generateBtn.innerHTML;
+    generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
+    generateBtn.disabled = true;
+    
+    // Timeout de seguridad para restaurar botón si la petición tarda mucho
+    const safetyTimeout = setTimeout(() => {
+        if (generateBtn.disabled) {
+            console.warn('Timeout de seguridad: Restaurando botón después de 10 segundos');
+            generateBtn.innerHTML = originalHTML;
+            generateBtn.disabled = false;
+        }
+    }, 10000); // 10 segundos de timeout
+    
+    fetch('/users/generate-token', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.access_token) {
+            // Decodificar el token para obtener su tiempo real de expiración
+            const decodedToken = decodeJWT(data.access_token);
+            if (decodedToken && decodedToken.exp) {
+                const tokenExpirationTime = decodedToken.exp * 1000;
+                
+                // Guardar en localStorage
+                localStorage.setItem('jwtToken', data.access_token);
+                localStorage.setItem('jwtRefreshToken', data.refresh_token);
+                localStorage.setItem('jwtTokenExpirationTime', tokenExpirationTime);
+                localStorage.setItem('jwtExpiresIn', data.expires_in);
+                localStorage.setItem('jwtTokenCreatedAt', data.token_created_at);
+                
+                // IMPORTANTE: Limpiar autenticación manual - generar token NO significa estar autenticado
+                localStorage.removeItem('jwtTokenUserId');
+                
+                // Mostrar el token en el modal
+                showTokenInModal(data.access_token);
+                
+                // Actualizar la información de token
+                updateTokenInfo();
+                
+                // CRÍTICO: Restaurar botón después de generar token exitosamente
+                generateBtn.innerHTML = '<i class="fas fa-key"></i> Generar Nuevo Token';
+                generateBtn.disabled = false;
+                
+                // Limpiar timeout de seguridad
+                clearTimeout(safetyTimeout);
+                
+                console.log('Token generado y mostrado en modal');
+            } else {
+                console.error('Error: No se pudo decodificar el token');
+                // Restaurar botón
+                generateBtn.innerHTML = originalHTML;
+                generateBtn.disabled = false;
+                // Limpiar timeout de seguridad
+                clearTimeout(safetyTimeout);
+            }
+        } else {
+            console.error('Error al generar token:', data.error || 'Error desconocido');
+            // Restaurar botón
+            generateBtn.innerHTML = originalHTML;
+            generateBtn.disabled = false;
+            // Limpiar timeout de seguridad
+            clearTimeout(safetyTimeout);
+        }
+    })
+    .catch(error => {
+        console.error('Error al generar token:', error.message);
+        // Restaurar botón
+        generateBtn.innerHTML = originalHTML;
+        generateBtn.disabled = false;
+        // Limpiar timeout de seguridad
+        clearTimeout(safetyTimeout);
+    });
+}
+
+function showTokenInModal(token) {
+    // Ocultar sección inicial
+    document.getElementById('noTokenModalSection').style.display = 'none';
+    
+    // Mostrar sección con token
+    document.getElementById('tokenGeneratedSection').style.display = 'block';
+    
+    // Mostrar el token en el textarea del modal
+    const modalTokenDisplay = document.getElementById('modalTokenDisplay');
+    if (modalTokenDisplay) {
+        modalTokenDisplay.value = token;
+        
+        // Decodificar token para mostrar información del usuario
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const tokenUserId = payload.sub || payload.identity;
+            const currentUserId = '{{ user.id }}';
+            const currentUsername = '{{ user.username }}';
+            
+            // Agregar información de usuario al modal
+            const userInfo = document.createElement('div');
+            userInfo.className = 'alert alert-info mt-2';
+            userInfo.innerHTML = `
+                <i class="fas fa-user-shield"></i> 
+                <strong>Token Personal Generado</strong><br>
+                👤 Propietario: ${currentUsername} (ID: ${currentUserId})<br>
+                🔐 Solo TÚ puedes usar este token para eliminar animes<br>
+                ⏰ Válido por 1 hora desde ahora
+            `;
+            
+            // Insertar después del textarea si no existe ya
+            if (!modalTokenDisplay.parentNode.querySelector('.alert-info')) {
+                modalTokenDisplay.parentNode.insertBefore(userInfo, modalTokenDisplay.nextSibling);
+            }
+            
+        } catch (e) {
+            console.warn('No se pudo decodificar token para mostrar info de usuario:', e);
+        }
+    }
+}
+
+function copyTokenFromModal() {
+    const token = localStorage.getItem('jwtToken');
+    if (!token) {
+        console.log('No se encontró token JWT para copiar');
+        return;
+    }
+    
+    // Copiar al portapapeles
+    navigator.clipboard.writeText(token).then(() => {
+        // Cambiar temporalmente el texto del botón para indicar éxito
+        const copyBtn = event.target.closest('button');
+        const originalHTML = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<i class="fas fa-check"></i> ¡Copiado!';
+        copyBtn.disabled = true;
+        
+        console.log('Token copiado desde modal');
+        
+        // Restaurar botón después de 2 segundos
+        setTimeout(() => {
+            copyBtn.innerHTML = originalHTML;
+            copyBtn.disabled = false;
+        }, 2000);
+        
+    }).catch(err => {
+        // Fallback para navegadores más antiguos
+        const modalTokenDisplay = document.getElementById('modalTokenDisplay');
+        if (modalTokenDisplay) {
+            modalTokenDisplay.select();
+            modalTokenDisplay.setSelectionRange(0, 99999);
+            document.execCommand('copy');
+            
+            // Feedback visual del botón
+            const copyBtn = event.target.closest('button');
+            const originalHTML = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<i class="fas fa-check"></i> ¡Copiado!';
+            copyBtn.disabled = true;
+            
+            setTimeout(() => {
+                copyBtn.innerHTML = originalHTML;
+                copyBtn.disabled = false;
+            }, 2000);
+            
+            console.log('Token copiado usando método fallback desde modal');
+        } else {
+            console.error('Error al copiar token desde modal:', err.message);
+        }
+    });
+}
+
+// Función goToTokenManagement eliminada - ya no se necesita
+
+// Resetear modal cuando se cierre
+document.getElementById('generateTokenModal').addEventListener('hidden.bs.modal', function () {
+    // Resetear a estado inicial
+    document.getElementById('noTokenModalSection').style.display = 'block';
+    document.getElementById('tokenGeneratedSection').style.display = 'none';
+    
+    // Limpiar token display del modal
+    const modalTokenDisplay = document.getElementById('modalTokenDisplay');
+    if (modalTokenDisplay) {
+        modalTokenDisplay.value = '';
     }
 });
 </script>

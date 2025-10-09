@@ -1,596 +1,638 @@
-# 🎌 CRUD API con Flask y SQLAlchemy - Release v2.0
+# 🎬 CRUD API con Flask y SQLAlchemy - Sistema Avanzado de Gestión de Animes
 
-Una aplicación web completa para la gestión de animes con **sistema de autenticación JWT** desarrollada con Flask, SQLAlchemy y MySQL. Esta aplicación implementa un sistema CRUD (Crear, Leer, Actualizar, Eliminar) con autenticación de usuarios, géneros dinámicos y una interfaz web moderna para administrar una base de datos de animes.
+Una aplicación web completa y segura de gestión de animes desarrollada con Flask, SQLAlchemy y MySQL que incluye un **sistema JWT manual de dos pasos**, interfaz web moderna, API REST protegida y funcionalidades avanzadas de seguridad.
 
-## 🆕 Novedades v2.0
+## ✨ Características Principales
 
-- 🔐 **Sistema de Autenticación JWT completo**
-- � **Registro y login de usuarios**
-- 🛡️ **Protección de rutas con tokens**
-- 🎬 **Géneros dinámicos desde base de datos**
-- 📱 **Interfaz de usuario moderna**
-- 🔗 **API REST con autenticación**
-- 📚 **40+ géneros de anime predefinidos**
+### 🔐 **Sistema de Autenticación Avanzado**
+- **JWT Manual de Dos Pasos**: Generación de token + Autenticación Manual obligatoria
+- **Seguridad Individual por Usuario**: Cada usuario debe usar únicamente SUS propios tokens
+- **Auto-Logout Inteligente**: Cierre automático de sesión al cerrar página/pestaña
+- **Gestión de Múltiples Pestañas**: Manejo inteligente de sesiones en varias pestañas
+- **Limpieza Automática**: LocalStorage se limpia automáticamente entre usuarios
 
-## �📋 Tabla de Contenidos
+### 🎨 **Interfaz de Usuario Moderna**
+- **Dashboard Interactivo**: Panel personalizado con información de token en tiempo real
+- **Modales Inteligentes**: Generación y autenticación de tokens en ventanas modales
+- **Información de Token Dinámica**: Estado, duración, tiempo restante y autenticación
+- **Gestión de Tokens**: Generar, verificar, eliminar y renovar tokens desde la interfaz
+- **Responsive Design**: Interfaz adaptable con Bootstrap 5
 
-- [Características](#características)
-- [Tecnologías Utilizadas](#tecnologías-utilizadas)
-- [Estructura del Proyecto](#estructura-del-proyecto)
-- [Requisitos](#requisitos)
-- [Instalación](#instalación)
-- [Configuración](#configuración)
-- [Uso](#uso)
-- [Sistema de Autenticación](#sistema-de-autenticación)
-- [API Endpoints](#api-endpoints)
-- [Base de Datos](#base-de-datos)
-- [Contribución](#contribución)
-- [Licencia](#licencia)
+### 🛡️ **Funcionalidades de Seguridad**
+- **Validación Cruzada**: Verificación frontend y backend de propietario de tokens
+- **Eliminación Segura de Animes**: Solo usuarios autenticados con SUS tokens pueden eliminar
+- **Limpieza de Sesión**: Logout completo con limpieza de localStorage
+- **Prevención de Uso Cruzado**: Tokens de otros usuarios automáticamente rechazados
+- **Auditoría Completa**: Logs detallados de todas las operaciones de seguridad
 
-## ✨ Características
+### 🎬 **Gestión Completa de Animes**
+- **CRUD Completo**: Crear, leer, actualizar y eliminar animes con autenticación
+- **Filtros Avanzados**: Búsqueda por género, año, tipo, estado y nombre
+- **Directorio Inteligente**: Vista optimizada con paginación y ordenamiento
+- **Formulario Mejorado**: Validación en tiempo real y experiencia de usuario fluida
 
-### 🔐 Autenticación y Seguridad
-- **Registro de usuarios** con validación completa
-- **Login/Logout seguro** con JWT tokens
-- **Dashboard personalizado** para cada usuario
-- **Protección de rutas** con middleware JWT
-- **Gestión de perfiles** de usuario
-- **Sistema dual**: Autenticación web + API REST
+## 📋 Requisitos del Sistema
 
-### 🎬 Gestión de Animes
-- **CRUD Completo**: Crear, leer, actualizar y eliminar animes
-- **Géneros Dinámicos**: 40+ géneros cargados desde base de datos
-- **Filtrado Avanzado**: Filtrar por género, año, tipo y estado
-- **Ordenamiento**: Ordenar alfabéticamente o por ID
-- **Búsqueda**: Sistema de búsqueda integrado
-- **Autorización**: Solo usuarios autenticados pueden eliminar
+- Python 3.8+
+- MySQL 5.7+ o MariaDB 10.3+
+- pip (gestor de paquetes de Python)
 
-### 🎨 Interfaz y UX
-- **Interfaz Responsiva**: Diseño moderno con Bootstrap 5
-- **Alertas Auto-ocultables**: Mensajes que desaparecen automáticamente
-- **Navegación Intuitiva**: Barra de navegación contextual
-- **Validación de Datos**: Validación tanto en frontend como backend
-- **Manejo de Errores**: Gestión robusta de errores y mensajes informativos
+## 🛠️ Instalación
 
-## 🛠 Tecnologías Utilizadas
+1. **Clonar el repositorio**
+   ```bash
+   git clone https://github.com/JohanCamiloMesa/Crud_Api_con_Flask_y_SqlAlchemy.git
+   cd Crud_Api_con_Flask_y_SqlAlchemy
+   ```
 
-### Backend
-- **Flask**: Framework web de Python
-- **SQLAlchemy**: ORM para base de datos
-- **Flask-SQLAlchemy**: Integración de SQLAlchemy con Flask
-- **Flask-JWT-Extended**: Manejo de tokens JWT
-- **Flasgger**: Documentación automática de API
-- **MySQL**: Sistema de gestión de base de datos
-- **python-dotenv**: Manejo de variables de entorno
-- **Werkzeug**: Hashing de contraseñas
-- **PyMySQL**: Conector MySQL optimizado
+2. **Crear entorno virtual**
+   ```bash
+   python -m venv .venv
+   # En Windows
+   .venv\Scripts\activate
+   # En Linux/Mac
+   source .venv/bin/activate
+   ```
 
-### Frontend
-- **HTML5**: Estructura de páginas
-- **Bootstrap 5**: Framework CSS moderno
-- **Font Awesome**: Iconografía
-- **JavaScript**: Interactividad y validaciones
-- **Jinja2**: Motor de plantillas de Flask
+3. **Instalar dependencias**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-### Base de Datos
-- **MySQL**: Base de datos principal
-- **Múltiples tablas**: Usuarios, Animes, Géneros
-- **Relaciones optimizadas**: Foreign keys y índices
+4. **Configurar variables de entorno**
+   
+   Crear un archivo `.env` en la raíz del proyecto:
+   ```env
+   MYSQL_USER=tu_usuario
+   MYSQL_PASSWORD=tu_contraseña
+   MYSQL_HOST=localhost
+   MYSQL_DB=anime_db
+   ```
+
+5. **Crear la base de datos**
+   ```sql
+   CREATE DATABASE anime_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   ```
+
+6. **Ejecutar la aplicación**
+   ```bash
+   python index.py
+   ```
+
+La aplicación estará disponible en `http://localhost:5000`
 
 ## 📁 Estructura del Proyecto
 
 ```
-Crud_Api_con_Flask_y_SqlAlchemy/
-├── app.py                          # Aplicación principal de Flask con JWT
-├── index.py                        # Punto de entrada de la aplicación
-├── requirements.txt                # Dependencias del proyecto
-├── README.md                       # Documentación del proyecto
-├── LICENSE                         # Licencia del proyecto
-├── AUTH_INTEGRATION.md             # Documentación de autenticación
-├── USER_INTERFACE_GUIDE.md         # Guía de interfaz de usuario
-│
-├── Config/                         # Configuraciones
-│   └── db_config.py               # Configuración de base de datos
-│
-├── Controller/                     # Controladores (Rutas)
-│   ├── animes_controller.py       # Controlador de animes
-│   └── user_controller.py         # Controlador de usuarios (NUEVO)
-│
-├── Models/                         # Modelos de datos
-│   ├── anime_model.py             # Modelo de anime y géneros
-│   └── user_model.py              # Modelo de usuario (NUEVO)
-│
-├── Services/                       # Lógica de negocio
-│   ├── anime_service.py           # Servicios de anime con géneros dinámicos
-│   └── user_service.py            # Servicios de usuario (NUEVO)
-│
-├── repositories/                   # Capa de acceso a datos (NUEVO)
-│   ├── __init__.py
-│   └── user_repository.py         # Repositorio de usuarios
-│
-├── Templates/                      # Plantillas HTML
-│   ├── Index.html                 # Página principal
-│   ├── Layout.html                # Plantilla base
-│   ├── Directorio.html            # Lista de animes con filtros dinámicos
-│   ├── Search_results.html        # Resultados de búsqueda
-│   ├── Update.html                # Formulario de actualización
-│   ├── Dashboard.html             # Dashboard de usuario (NUEVO)
-│   ├── Login.html                 # Página de login (NUEVO)
-│   ├── Register.html              # Página de registro (NUEVO)
-│   ├── Profile.html               # Perfil de usuario (NUEVO)
-│   ├── Token.html                 # Gestión de tokens (NUEVO)
-│   └── partials/                  # Componentes parciales
-│       ├── _message.html          # Mensajes flash mejorados
-│       ├── _navegationbar.html    # Barra de navegación con autenticación
-│       └── _taskform.html         # Formulario con géneros dinámicos
-│
-├── Utils/                          # Utilidades
-│   └── database.py                # Configuración de SQLAlchemy
-│
-└── src/                           # Scripts auxiliares
-    ├── dbcreate.py                # Creación de base de datos
-    └── populate_genres.py         # Poblado de géneros automático (NUEVO)
+├── app.py                 # Configuración principal de Flask
+├── index.py              # Punto de entrada de la aplicación
+├── requirements.txt      # Dependencias del proyecto
+├── Config/
+│   └── db_config.py     # Configuración de base de datos
+├── Controller/
+│   ├── animes_controller.py    # Controlador de animes
+│   └── user_controller.py      # Controlador de usuarios
+├── Models/
+│   ├── anime_model.py   # Modelo de datos de anime
+│   └── user_model.py    # Modelo de datos de usuario
+├── Services/
+│   ├── anime_service.py # Lógica de negocio de animes
+│   └── user_service.py  # Lógica de negocio de usuarios
+├── repositories/
+│   └── user_repository.py     # Capa de acceso a datos
+├── Templates/           # Plantillas HTML
+│   ├── Index.html
+│   ├── Dashboard.html
+│   ├── Login.html
+│   └── ...
+├── Utils/
+│   └── database.py      # Configuración de SQLAlchemy
+└── src/
+    ├── dbcreate.py      # Inicialización de BD
+    └── populate_genres.py # Datos iniciales
 ```
 
-## 📋 Requisitos
+## 🔧 API Endpoints
 
-### Requisitos del Sistema
-- Python 3.7+
-- MySQL 5.7+ o MariaDB
-- pip (gestor de paquetes de Python)
+### 🎬 **Animes**
+- `GET /` - Página principal con lista de animes
+- `GET /directory` - Directorio con filtros avanzados y paginación
+- `GET /search` - Búsqueda de animes por nombre
+- `GET /new` - Formulario para agregar anime (requiere autenticación)
+- `POST /new` - Crear nuevo anime (requiere autenticación)
+- `GET /update/<id>` - Formulario de edición (requiere autenticación)
+- `POST /update/<id>` - Actualizar anime (requiere autenticación)
+- `DELETE /api/delete/<id>` - Eliminar anime (requiere JWT válido)
 
-### Dependencias Python
-Las dependencias se encuentran listadas en `requirements.txt` e incluyen:
+### 👤 **Usuarios y Autenticación**
+- `GET /users/register-page` - Página de registro
+- `POST /users/register` - Registro de nuevo usuario
+- `GET /users/login-page` - Página de login
+- `POST /users/login` - Iniciar sesión web
+- `POST /users/login` - API de login (JSON)
+- `GET /users/dashboard` - Dashboard personalizado (requiere autenticación)
+- `GET /users/logout` - Cerrar sesión con limpieza completa
+- `POST /users/auto-logout` - Logout automático al cerrar página
 
+### 🔐 **Sistema JWT Manual**
+- `POST /users/generate-token` - Generar token JWT (requiere sesión activa)
+- `GET /users/protected` - Verificar validez de token JWT
+- `GET /users/token-status` - Estado detallado del token
+- `POST /users/refresh` - Renovar token JWT
+- `GET /users/token-page` - Página de gestión de tokens
+
+### 🛡️ **Endpoints de Seguridad**
+- `GET /users/profile-page` - Perfil de usuario
+- `POST /users/validate-token` - Validar token manualmente
+- `GET /users/` - Lista de usuarios (requiere JWT)
+
+## 🎯 Guía de Uso Completa
+
+### 👤 **1. Registro e Inicio de Sesión**
+1. **Registrarse**: Accede a `/users/register-page` para crear una cuenta nueva
+2. **Iniciar Sesión**: Usa `/users/login-page` con tus credenciales
+3. **Dashboard**: Automáticamente redirige al dashboard personalizado
+
+### 🔐 **2. Sistema JWT Manual (Paso a Paso)**
+
+#### **Generar Token**
+1. En el Dashboard, haz clic en **"Obtener Token"**
+2. Se abre modal con tu token JWT personal (válido 1 hora)
+3. **IMPORTANTE**: Generar token ≠ Estar autenticado
+
+#### **Autenticarse Manualmente**
+1. Haz clic en **"Autenticarse"** en el Dashboard
+2. Pega tu token JWT en el modal de autenticación
+3. El sistema verifica que el token sea **tuyo**
+4. Solo entonces puedes eliminar animes
+
+#### **Información de Token**
+- **Duración**: Tiempo de expiración (1 hora)
+- **Estado**: Activo/Expirado con tiempo restante
+- **Autenticado**: Muestra si puedes eliminar animes
+
+#### **Gestión de Tokens**
+- **Verificar Estado**: Valida token contra el servidor
+- **Eliminar Token**: Limpia completamente el token
+- **Generar Nuevo**: Crea token fresco cuando expires
+
+### 🎬 **3. Gestión de Animes**
+
+#### **Ver y Explorar**
+1. **Página Principal**: Vista general de todos los animes
+2. **Directorio**: Filtros avanzados por género, año, tipo, estado
+3. **Búsqueda**: Busca animes específicos por nombre
+
+#### **Agregar Anime**
+1. **Desde Dashboard**: Clic en "Agregar Anime"
+2. **Llenar Formulario**: Nombre, género, año, tipo, estado
+3. **Enviar**: Se guarda y redirige al directorio
+
+#### **Eliminar Anime** (⚠️ Requiere Autenticación)
+1. **Generar Token**: Obtén tu token JWT personal
+2. **Autenticarse**: Valida tu token en el modal
+3. **Eliminar**: Solo entonces puedes eliminar animes
+4. **Seguridad**: Solo puedes usar TU propio token
+
+### 🔒 **4. Características de Seguridad**
+
+#### **Individual por Usuario**
+- Cada usuario debe generar **SUS PROPIOS** tokens
+- Tokens de otros usuarios son **automáticamente rechazados**
+- Sistema verifica propietario del token
+
+#### **Auto-Logout**
+- Al cerrar página/pestaña → Sesión se cierra automáticamente
+- Múltiples pestañas manejadas inteligentemente
+- LocalStorage se limpia entre usuarios
+
+#### **Limpieza de Sesión**
+- Logout manual limpia **completamente** localStorage
+- Nuevo usuario empieza con localStorage vacío
+- Sin tokens residuales de usuarios anteriores
+
+## 🔒 Sistema de Autenticación Avanzado
+
+### 🎯 **JWT Manual de Dos Pasos**
+El proyecto implementa un sistema de autenticación único con **Flask-JWT-Extended**:
+
+#### **Paso 1: Generar Token**
+- Usuario inicia sesión web normalmente
+- Puede generar token JWT desde el Dashboard
+- Token es personal e intransferible (contiene user_id)
+- **Generar ≠ Estar Autenticado**
+
+#### **Paso 2: Autenticación Manual**
+- Usuario debe autenticarse manualmente con su token
+- Pega token en modal de autenticación
+- Sistema verifica propietario del token
+- Solo entonces puede realizar operaciones críticas
+
+### 🛡️ **Características de Seguridad**
+
+#### **Validación Individual**
+```javascript
+// Frontend verifica propietario
+if (tokenUserId !== currentUserId) {
+    // Rechaza token de otro usuario
+    alert('Token no válido para tu usuario');
+    return;
+}
 ```
-Flask>=2.3.0
-Flask-SQLAlchemy>=3.0.0
-Flask-JWT-Extended>=4.5.0
-Flasgger>=0.9.7
-python-dotenv>=1.0.0
-Werkzeug>=2.3.0
-PyMySQL>=1.1.0
+
+#### **Backend Protegido**
+```python
+@jwt_required()
+def api_delete_anime(id):
+    current_user_id = get_jwt_identity()
+    # Solo el propietario del token puede actuar
 ```
 
-## 🚀 Instalación
+#### **Auto-Logout Inteligente**
+- Event listener `beforeunload` detecta cierre de página
+- `navigator.sendBeacon()` envía logout al servidor
+- Limpieza automática de localStorage
+- Gestión de múltiples pestañas
 
-### 1. Clonar el repositorio
+### ⏰ **Configuración de Tokens**
+```python
+# En app.py
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)  # 1 hora
+app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=30)  # 30 días
 
-```bash
-git clone https://github.com/JohanCamiloMesa/Crud_Api_con_Flask_y_SqlAlchemy.git
-cd Crud_Api_con_Flask_y_SqlAlchemy
+# En user_controller.py
+'expires_in': 3600,  # 1 hora en segundos
 ```
 
-### 2. Crear entorno virtual
+### 🔄 **Flujo Completo de Seguridad**
+1. **Login Web** → Sesión activa
+2. **Generar Token** → Token personal creado
+3. **Autenticación Manual** → Validación obligatoria
+4. **Operaciones Críticas** → Solo con autenticación completa
+5. **Auto-Logout** → Limpieza automática al cerrar página
 
-```bash
-# Windows
-python -m venv venv
-venv\Scripts\activate
+## 🗄️ Modelos de Datos
 
-# Linux/Mac
-python3 -m venv venv
-source venv/bin/activate
+### Anime
+```python
+- id: Integer (Primary Key)
+- name: String(255)
+- genre: String(50)
+- year: Integer
+- type: String(50)
+- status: String(50)
 ```
 
-### 3. Instalar dependencias
-
-```bash
-pip install -r requirements.txt
+### Usuario
+```python
+- id: Integer (Primary Key)
+- username: String(80)
+- password: String(255) # Hasheada
 ```
 
-### 4. Configurar base de datos MySQL
+### Categorías de Género
+```python
+- id: Integer (Primary Key)
+- name: String(100)
+```
 
-Asegúrate de tener MySQL instalado y ejecutándose en tu sistema.
+## 🚀 Despliegue y Configuración Avanzada
 
-## ⚙️ Configuración
-
-### Variables de Entorno
-
-Crea un archivo `.env` en la raíz del proyecto con las siguientes variables:
-
+### **Variables de Entorno de Producción**
 ```env
-# Configuración de MySQL
-MYSQL_USER=tu_usuario
-MYSQL_PASSWORD=tu_contraseña
-MYSQL_HOST=localhost
-MYSQL_DB=animes_db
+# Configuración Flask
+FLASK_ENV=production
+FLASK_DEBUG=False
+SECRET_KEY=tu_clave_secreta_super_segura
+
+# Base de Datos MySQL
+MYSQL_USER=usuario_produccion
+MYSQL_PASSWORD=contraseña_ultra_segura
+MYSQL_HOST=tu_host_mysql
+MYSQL_DB=anime_db_production
+MYSQL_PORT=3306
 
 # Configuración JWT
-JWT_SECRET_KEY=tu_clave_secreta_super_segura
-
-# Alternativa: URI completa de base de datos
-DATABASE_URI=mysql://usuario:contraseña@localhost/animes_db
+JWT_SECRET_KEY=clave_jwt_super_compleja_256_bits
+JWT_ACCESS_TOKEN_EXPIRES=3600  # 1 hora
+JWT_REFRESH_TOKEN_EXPIRES=2592000  # 30 días
 ```
 
-### Configuración de Base de Datos
-
-La aplicación creará automáticamente:
-1. **Base de datos** si no existe
-2. **Tablas necesarias** (Users, Animes, GenreCategories)
-3. **Géneros predefinidos** (40+ géneros de anime)
-
-### Inicialización Automática
-
-Al ejecutar por primera vez:
+### **Comandos de Despliegue Completo**
 ```bash
-python src/populate_genres.py  # Poblar géneros (opcional)
-python index.py                # Iniciar aplicación
-```
+# 1. Clonar y configurar entorno
+git clone <tu-repo>
+cd Crud_Api_con_Flask_y_SqlAlchemy
+python -m venv anime_env
+source anime_env/bin/activate  # Linux/Mac
+# O: anime_env\Scripts\activate  # Windows
 
-## 🎮 Uso
-
-### Iniciar la aplicación
-
-```bash
-# Activar entorno virtual
-venv\Scripts\activate  # Windows
-source venv/bin/activate  # Linux/Mac
-
-# Instalar dependencias
+# 2. Instalar dependencias
+pip install --upgrade pip
 pip install -r requirements.txt
 
-# Iniciar aplicación
+# 3. Configurar base de datos
+python src/dbcreate.py        # Crear tablas
+python src/populate_genres.py # Poblar géneros
+
+# 4. Verificar configuración
+python -c "from app import app; print('✅ App configurada correctamente')"
+
+# 5. Iniciar aplicación
+# Desarrollo:
 python index.py
+
+# Producción (con Gunicorn):
+pip install gunicorn
+gunicorn --bind 0.0.0.0:5000 --workers 4 index:app
 ```
 
-La aplicación estará disponible en: `http://localhost:5000`
+### **Docker Deployment (Opcional)**
+```dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+EXPOSE 5000
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "index:app"]
+```
 
-### Funcionalidades Principales
+### **Nginx Reverse Proxy**
+```nginx
+server {
+    listen 80;
+    server_name tu-dominio.com;
+    
+    location / {
+        proxy_pass http://localhost:5000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+```
 
-#### 🔐 Sistema de Autenticación
-1. **Registro** (`/register`): Crear nueva cuenta de usuario
-2. **Login** (`/login`): Iniciar sesión con credenciales
-3. **Dashboard** (`/dashboard`): Panel personal del usuario
-4. **Profile** (`/profile`): Gestión de perfil de usuario
-5. **Logout** (`/logout`): Cerrar sesión y limpiar tokens
+## � Testing y Calidad
 
-#### 🎬 Gestión de Animes
-1. **Página Principal** (`/`): Formulario para agregar nuevos animes (requiere autenticación)
-2. **Directorio** (`/directory`): Lista completa con filtros dinámicos
-3. **Búsqueda** (`/search`): Búsqueda avanzada por nombre
-4. **Editar** (`/update/<id>`): Actualizar información
-5. **Eliminar**: Eliminar con confirmación JWT (solo usuarios autenticados)
+### **Testing Manual con Postman**
+```json
+// Colección de endpoints para testing
+{
+  "endpoints": [
+    "POST /users/api/token",        // Generar JWT
+    "GET /users/token-status",      // Verificar token
+    "POST /users/validate-token",   // Autenticación manual
+    "DELETE /animes/api/1",         // Eliminar anime (requiere JWT)
+    "GET /animes/search?q=naruto"   // Búsqueda de animes
+  ]
+}
+```
 
-### 🎛️ Filtros Avanzados
+### **Pruebas de Seguridad Recomendadas**
+1. **Cross-User Token**: Verificar que tokens de otros usuarios sean rechazados
+2. **Token Expiration**: Comprobar expiración de tokens (1 hora)
+3. **Auto-logout**: Cerrar páginas y verificar limpieza de sesión
+4. **SQL Injection**: Probar inputs maliciosos en formularios
+5. **XSS Prevention**: Verificar escape de caracteres especiales
 
-- **Género**: 40+ géneros dinámicos desde base de datos
-- **Año**: Filtro por año de lanzamiento (1900-2100)
-- **Tipo**: TV, Movie, OVA, Special
-- **Estado**: Completed, Ongoing, Upcoming
-- **Ordenamiento**: Alfabético o por ID
+## 🤝 Contribuir al Proyecto
 
-## 🔐 Sistema de Autenticación
+### **Guía de Contribución**
+1. **Fork del Proyecto**
+   ```bash
+   git clone https://github.com/tu-usuario/Crud_Api_con_Flask_y_SqlAlchemy.git
+   cd Crud_Api_con_Flask_y_SqlAlchemy
+   ```
 
-### Registro de Usuario
-- Validación de email único
-- Hash seguro de contraseñas con Werkzeug
-- Campos: nombre, email, contraseña
+2. **Crear Rama de Feature**
+   ```bash
+   git checkout -b feature/nueva-funcionalidad
+   # Ejemplos:
+   # feature/admin-panel
+   # bugfix/token-validation
+   # security/rate-limiting
+   ```
 
-### Login y JWT
-- Autenticación con email/contraseña
-- Generación de token JWT
-- Almacenamiento en localStorage del navegador
-- Expiración configurable de tokens
+3. **Desarrollo y Testing**
+   ```bash
+   # Activar entorno virtual
+   source anime_env/bin/activate
+   
+   # Instalar dependencias de desarrollo
+   pip install pytest flask-testing
+   
+   # Ejecutar tests (si existen)
+   python -m pytest tests/
+   ```
 
-### Protección de Rutas
-- Middleware JWT para rutas protegidas
-- Verificación automática de tokens
-- Redirección a login si no está autenticado
+4. **Commit con Estándares**
+   ```bash
+   git add .
+   git commit -m "feat: agregar autenticación de dos factores"
+   # Prefijos: feat, fix, docs, style, refactor, test, chore
+   ```
 
-### Autorización
-- Solo usuarios autenticados pueden:
-  - Agregar nuevos animes
-  - Eliminar animes existentes
-- Funcionalidades públicas:
-  - Ver directorio de animes
-  - Buscar animes
-  - Editar animes
+5. **Push y Pull Request**
+   ```bash
+   git push origin feature/nueva-funcionalidad
+   # Crear PR en GitHub con descripción detallada
+   ```
 
-## 🔗 API Endpoints
+### **Estándares de Código**
+- **Python**: Seguir PEP 8
+- **JavaScript**: Usar ES6+ y camelCase
+- **HTML/CSS**: Indentación de 2 espacios
+- **Comentarios**: Documentar funciones complejas
+- **Commits**: Mensajes descriptivos en español/inglés
 
-### 🔐 Autenticación (API REST)
+## 🌐 Stack Tecnológico Completo
 
-| Método | Endpoint | Descripción | Autenticación |
-|--------|----------|-------------|---------------|
-| POST | `/api/register` | Registro de usuario | No |
-| POST | `/api/login` | Login y obtención de token | No |
-| POST | `/api/logout` | Logout y revocación de token | JWT |
+### **Backend (Python)**
+```python
+Flask 3.0+           # Framework web principal
+SQLAlchemy 2.0+      # ORM para base de datos avanzado
+Flask-JWT-Extended   # Sistema JWT con validación individual
+PyMySQL             # Conector MySQL optimizado
+Werkzeug            # Utilidades web y seguridad
+Python-dotenv       # Gestión de variables de entorno
+```
 
-### 👤 Usuarios (Web Interface)
+### **Frontend (Moderno)**
+```html
+HTML5 Semántico     # Estructura web moderna
+CSS3 + Grid/Flexbox # Diseño responsivo avanzado
+Bootstrap 5.3       # Framework UI/UX profesional
+JavaScript ES6+     # Interactividad y API calls
+Jinja2 Templates    # Motor de plantillas dinámico
+```
 
-| Método | Endpoint | Descripción | Autenticación |
-|--------|----------|-------------|---------------|
-| GET | `/register` | Página de registro | No |
-| POST | `/register` | Procesar registro | No |
-| GET | `/login` | Página de login | No |
-| POST | `/login` | Procesar login | No |
-| GET | `/dashboard` | Dashboard del usuario | Sesión |
-| GET | `/profile` | Perfil del usuario | Sesión |
-| POST | `/logout` | Cerrar sesión | Sesión |
-
-### 🎬 Animes (Web + API)
-
-| Método | Endpoint | Descripción | Autenticación |
-|--------|----------|-------------|---------------|
-| GET | `/` | Página principal con formulario | No |
-| POST | `/new` | Crear nuevo anime | JWT/Sesión |
-| GET | `/directory` | Lista de animes con filtros | No |
-| GET | `/search` | Búsqueda de animes | No |
-| POST | `/search` | Procesar búsqueda | No |
-| GET | `/update/<id>` | Formulario de edición | No |
-| POST | `/update/<id>` | Actualizar anime | No |
-| DELETE | `/delete/<id>` | Eliminar anime | JWT |
-
-### � Géneros (API)
-
-| Método | Endpoint | Descripción | Autenticación |
-|--------|----------|-------------|---------------|
-| GET | `/api/genres` | Lista de todos los géneros | No |
-
-### 📚 Documentación
-
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| GET | `/apidocs/` | Documentación Swagger UI |
-
-## �🗃️ Base de Datos
-
-### Tabla Users (NUEVA)
-
+### **Base de Datos y Persistencia**
 ```sql
-CREATE TABLE Users (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+MySQL 8.0+          # Sistema de gestión relacional
+Índices optimizados # Rendimiento en consultas
+Foreign Keys        # Integridad referencial
+Connection Pooling  # Gestión eficiente de conexiones
 ```
 
-### Tabla GenreCategories (NUEVA)
-
-```sql
-CREATE TABLE GenreCategories (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(100) UNIQUE NOT NULL
-);
+### **Seguridad Avanzada**
+```python
+JWT Individual      # Tokens únicos por usuario
+CORS Configurado    # Política de origen cruzado
+Session Management  # Gestión avanzada de sesiones
+Auto-logout         # Limpieza automática inteligente
+Input Validation    # Validación exhaustiva de entrada
+Password Hashing    # Werkzeug security para contraseñas
 ```
 
-### Tabla Animes (ACTUALIZADA)
-
-```sql
-CREATE TABLE Animes (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL,
-    genre VARCHAR(50) NOT NULL,
-    year INT NOT NULL,
-    type VARCHAR(50) NOT NULL,
-    status VARCHAR(50) NOT NULL
-);
-```
-
-### Géneros Predefinidos (40+ géneros)
-
-```
-Acción, Artes Marciales, Aventuras, Carreras, Ciencia Ficción, Comedia, 
-Demencia, Demonios, Deportes, Drama, Ecchi, Escolares, Espacial, Fantasía, 
-Harem, Historico, Infantil, Josei, Juegos, Magia, Mecha, Militar, Misterio, 
-Música, Parodia, Policía, Psicológico, Recuentos de la vida, Romance, 
-Samurai, Seinen, Shoujo, Shounen, Sobrenatural, Superpoderes, Suspenso, 
-Terror, Vampiros, Yaoi, Yuri
-```
-
-### Campos del Modelo
-
-#### User
-- **id**: Identificador único (INTEGER, PRIMARY KEY)
-- **name**: Nombre completo (STRING, NOT NULL)
-- **email**: Email único (STRING, UNIQUE, NOT NULL)
-- **password_hash**: Contraseña hasheada (STRING, NOT NULL)
-- **created_at**: Fecha de creación (TIMESTAMP)
-
-#### Anime
-- **id**: Identificador único (INTEGER, PRIMARY KEY)
-- **name**: Nombre del anime (STRING, NOT NULL)
-- **genre**: Género del anime (STRING, NOT NULL)
-- **year**: Año de lanzamiento (INTEGER, NOT NULL)
-- **type**: Tipo de anime (STRING, NOT NULL)
-- **status**: Estado del anime (STRING, NOT NULL)
-
-#### GenreCategory
-- **id**: Identificador único (INTEGER, PRIMARY KEY)
-- **name**: Nombre del género (STRING, UNIQUE, NOT NULL)
-
-## 🔧 Desarrollo
-
-### Arquitectura del Sistema
-
-#### Patrón MVC Implementado
-- **Modelos** (`Models/`): Entidades de base de datos con SQLAlchemy
-- **Vistas** (`Templates/`): Interfaces de usuario con Jinja2
-- **Controladores** (`Controller/`): Lógica de rutas y endpoints
-
-#### Capas de la Aplicación
-1. **Presentación**: Templates HTML con Bootstrap 5
-2. **Controladores**: Manejo de peticiones HTTP
-3. **Servicios**: Lógica de negocio y validaciones
-4. **Repositorios**: Acceso a datos (para usuarios)
-5. **Modelos**: Definición de entidades
-6. **Base de Datos**: MySQL con SQLAlchemy ORM
-
-### Separación de Responsabilidades
-
-#### Servicios (`Services/`)
-- **anime_service.py**: CRUD de animes, géneros dinámicos
-- **user_service.py**: Autenticación, registro, gestión de usuarios
-
-#### Controladores (`Controller/`)
-- **animes_controller.py**: Rutas para gestión de animes
-- **user_controller.py**: Rutas para autenticación y usuarios
-
-#### Repositorios (`repositories/`)
-- **user_repository.py**: Acceso a datos de usuarios
-- Patrón Repository para abstracción de datos
-
-### Validaciones y Seguridad
-
-#### Validaciones Implementadas
-- **Frontend**: JavaScript + HTML5 validation
-- **Backend**: Validación en servicios
-- **Base de Datos**: Constraints y tipos de datos
-
-#### Seguridad
-- **Passwords**: Hash con Werkzeug (SHA-256 + salt)
-- **JWT Tokens**: Tokens seguros con expiración
-- **CORS**: Configuración de headers seguros
-- **Input Validation**: Sanitización de entradas
-- **SQL Injection**: Protección con SQLAlchemy ORM
-
-### Nuevas Características v2.0
-
-#### Géneros Dinámicos
-- Migración de géneros hardcodeados a base de datos
-- Script automático de población (`populate_genres.py`)
-- Dropdowns dinámicos en todos los formularios
-- 40+ géneros de anime predefinidos
-
-#### Sistema de Autenticación
-- JWT tokens para API REST
-- Sesiones web para interfaz de usuario
-- Middleware de autorización
-- Dashboard personalizado
-
-#### Mejoras de UI/UX
-- Alertas auto-ocultables (4 segundos)
-- Navegación contextual según autenticación
-- Diseño responsive moderno
-- Iconografía con Font Awesome
-
-## 📖 Documentación Adicional
-
-### Archivos de Documentación
-- **AUTH_INTEGRATION.md**: Guía completa del sistema de autenticación
-- **USER_INTERFACE_GUIDE.md**: Manual de la interfaz de usuario
-- **README.md**: Documentación principal (este archivo)
-
-### API Documentation
-- **Swagger UI**: Disponible en `/apidocs/`
-- **Endpoints**: Documentación automática con Flasgger
-- **Schemas**: Definición de modelos de request/response
-
-### Scripts Auxiliares
-- **populate_genres.py**: Poblar géneros automáticamente
-- **dbcreate.py**: Inicialización de base de datos
-- Ejecutables independientemente para mantenimiento
-
-## 🚀 Despliegue
-
-### Desarrollo Local
+### **Herramientas de Desarrollo**
 ```bash
-# Instalar dependencias
-pip install -r requirements.txt
-
-# Configurar variables de entorno
-cp .env.example .env
-# Editar .env con tus credenciales
-
-# Poblar géneros (opcional)
-python src/populate_genres.py
-
-# Iniciar aplicación
-python index.py
+Git                 # Control de versiones
+Postman             # Testing de API endpoints
+Chrome DevTools     # Debugging frontend
+Python Virtual Env  # Aislamiento de dependencias
 ```
 
-### Producción
-1. **Configurar MySQL** en servidor
-2. **Variables de entorno** seguras
-3. **JWT_SECRET_KEY** robusto
-4. **HTTPS** habilitado
-5. **Servidor WSGI** (Gunicorn, uWSGI)
+## � Roadmap y Mejoras Futuras
 
-## 🧪 Testing
+### **🔮 Próximas Características**
+- [ ] **Admin Panel**: Dashboard administrativo con gestión de usuarios
+- [ ] **Rate Limiting**: Protección contra spam y ataques DDoS
+- [ ] **Email Verification**: Verificación por correo en registro
+- [ ] **Two-Factor Authentication**: Autenticación de dos factores (2FA)
+- [ ] **API Versioning**: Versionado de endpoints (/api/v1/, /api/v2/)
+- [ ] **Logging Avanzado**: Sistema de logs estructurados
+- [ ] **Cache Redis**: Cache para consultas frecuentes
+- [ ] **WebSocket**: Notificaciones en tiempo real
 
-### Funcionalidades a Probar
-- [ ] Registro de usuarios
-- [ ] Login/Logout
-- [ ] CRUD de animes
-- [ ] Filtros dinámicos
-- [ ] Autorización JWT
-- [ ] Géneros dinámicos
+### **🔧 Mejoras Técnicas Planificadas**
+- [ ] **Unit Testing**: Suite completa de pruebas automatizadas
+- [ ] **API Documentation**: Swagger/OpenAPI documentation
+- [ ] **Performance Monitoring**: Métricas de rendimiento
+- [ ] **Database Migration**: Sistema de migraciones automáticas
+- [ ] **Docker Compose**: Orquestación completa con MySQL
+- [ ] **CI/CD Pipeline**: GitHub Actions para deploy automático
 
-### Datos de Prueba
-- **Usuario**: test@example.com / password123
-- **Géneros**: Cargados automáticamente
-- **Animes**: Crear via interfaz web
+## 📝 Licencia
 
-## 🤝 Contribución
+```
+MIT License
 
-¡Las contribuciones son bienvenidas! Para contribuir:
+Copyright (c) 2024 Johan Camilo Mesa
 
-1. **Fork** el proyecto
-2. **Crea una rama** para tu feature (`git checkout -b feature/AmazingFeature`)
-3. **Commit** tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. **Push** a la rama (`git push origin feature/AmazingFeature`)
-5. **Abre un Pull Request**
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-### Áreas de Contribución
-- 🔐 Mejoras de seguridad
-- 🎨 Diseño y UX
-- � Responsividad móvil
-- 🧪 Tests unitarios
-- 📖 Documentación
-- 🌐 Internacionalización
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-### Estándares de Código
-- **PEP 8** para Python
-- **Comentarios** en español
-- **Docstrings** descriptivos
-- **Validaciones** robustas
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+```
 
-## �📝 Licencia
+## 👨‍💻 Información del Desarrollador
 
-Este proyecto está bajo la **Licencia MIT**. Ver el archivo [LICENSE](LICENSE) para más detalles.
+### **Johan Camilo Mesa** 
+🚀 **Full Stack Developer & Security Enthusiast**
 
-## 👨‍💻 Autor
+```python
+developer = {
+    "name": "Johan Camilo Mesa",
+    "role": "Full Stack Developer",
+    "expertise": ["Python", "Flask", "JWT Security", "MySQL", "JavaScript"],
+    "current_project": "Advanced JWT Authentication System",
+    "github": "@JohanCamiloMesa",
+    "specialization": "Web Security & API Development"
+}
+```
 
-**Johan Camilo Mesa**
-- 🌐 GitHub: [@JohanCamiloMesa](https://github.com/JohanCamiloMesa)
-- 📧 Email: [Contacto](mailto:johancamilomesa@gmail.com)
+**Contacto:**
+- 🔗 **GitHub**: [@JohanCamiloMesa](https://github.com/JohanCamiloMesa)
+- 💼 **LinkedIn**: [Johan Camilo Mesa](https://linkedin.com/in/johancamilomesa)
+- 📧 **Email**: johan.mesa@ejemplo.com
+- 🌐 **Portfolio**: [johancamilomesa.dev](https://johancamilomesa.dev)
 
-## 🙏 Agradecimientos
+## 🐛 Reportar Issues y Soporte
 
-- **Flask Community** por el excelente framework
-- **SQLAlchemy** por el ORM robusto
-- **Bootstrap** por los componentes UI
-- **JWT** por la seguridad en tokens
-- **MySQL** por la base de datos confiable
+### **🔍 Antes de Reportar**
+1. **Busca issues existentes** en el repositorio
+2. **Verifica la documentación** - puede ser una configuración
+3. **Prueba en entorno limpio** - aislamiento de dependencias
+4. **Revisa los logs** - pueden dar pistas del problema
 
-## 📊 Estadísticas del Proyecto
+### **📋 Template para Issues**
+```markdown
+## 🐛 Descripción del Bug
+Descripción clara y concisa del problema.
 
-- **Líneas de código**: 2000+ líneas
-- **Archivos**: 25+ archivos
-- **Modelos**: 3 (User, Anime, GenreCategory)
-- **Endpoints**: 15+ rutas
-- **Templates**: 10+ páginas
-- **Géneros**: 40+ predefinidos
+## 🔄 Pasos para Reproducir
+1. Ir a '...'
+2. Hacer clic en '...'
+3. Ver error
 
-## 🔄 Historial de Versiones
+## ✅ Comportamiento Esperado
+Lo que debería ocurrir normalmente.
 
-### v2.0.0 (Release Actual)
-- ✅ Sistema de autenticación JWT completo
-- ✅ Géneros dinámicos desde base de datos
-- ✅ Interfaz de usuario moderna
-- ✅ 40+ géneros predefinidos
-- ✅ Documentación completa
+## 📱 Entorno
+- OS: [Windows/Linux/macOS]
+- Browser: [Chrome/Firefox/Safari]
+- Python Version: [3.11/3.12]
+- Flask Version: [3.0+]
 
-### v1.0.0 (Versión Inicial)
-- ✅ CRUD básico de animes
-- ✅ Filtros hardcodeados
-- ✅ Interfaz básica
+## 📸 Screenshots
+Si aplica, adjunta capturas de pantalla.
+```
+
+### **💡 Sugerencias de Mejoras**
+¿Tienes ideas para nuevas características? ¡Compártelas!
+- Usa el template de **Feature Request**
+- Explica el **caso de uso**
+- Describe el **beneficio** para los usuarios
 
 ---
 
-⭐️ **Si este proyecto te fue útil, ¡dale una estrella en GitHub!**
+## 🏆 Reconocimientos
 
-📢 **¡Sígueme para más proyectos interesantes!**
+### **🙏 Agradecimientos Especiales**
+- **Flask Community** - Por el excelente framework
+- **Bootstrap Team** - Por el sistema de diseño
+- **JWT.io** - Por la especificación JWT
+- **MySQL Team** - Por el sistema de base de datos
+- **Open Source Community** - Por inspiración y recursos
+
+### **📚 Recursos y Referencias**
+- [Flask Documentation](https://flask.palletsprojects.com/)
+- [JWT Best Practices](https://auth0.com/blog/a-look-at-the-latest-draft-for-jwt-bcp/)
+- [OWASP Security Guidelines](https://owasp.org/www-project-top-ten/)
+- [Bootstrap 5 Documentation](https://getbootstrap.com/docs/5.3/)
+
+---
+
+<div align="center">
+
+### 🌟 **¿Te gustó el proyecto?**
+
+Si este proyecto te ha sido útil, considera:
+
+⭐ **Darle una estrella** en GitHub  
+🍴 **Hacer un fork** para tus propios proyectos  
+🐛 **Reportar bugs** que encuentres  
+💡 **Sugerir mejoras** que te gustaría ver  
+🤝 **Contribuir** con código  
+
+---
+
+**📢 Sígueme para más proyectos como este:**
+
+[![GitHub](https://img.shields.io/badge/GitHub-JohanCamiloMesa-black?style=for-the-badge&logo=github)](https://github.com/JohanCamiloMesa)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Johan_Camilo_Mesa-blue?style=for-the-badge&logo=linkedin)](https://linkedin.com/in/johancamilomesa)
+
+---
+
+### 🚀 **¡Construyamos el futuro del desarrollo web juntos!**
+
+</div>

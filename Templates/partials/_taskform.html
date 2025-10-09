@@ -49,10 +49,13 @@
             </select>
         </div>
 
-        <div class="text-center">
+        <div class="d-grid gap-2">
             <button type="submit" class="btn btn-primary">
                 <i class="fas fa-save"></i> Guardar Anime
             </button>
+            <a href="{{ url_for('users.dashboard') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Volver al Dashboard
+            </a>
         </div>
     </div>
 </form>

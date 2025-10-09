@@ -87,6 +87,24 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <script>
+// === LIMPIEZA DE SEGURIDAD AL INICIAR SESIÓN ===
+// Cuando alguien inicia sesión, limpiar TODOS los tokens del usuario anterior
+console.log('🔐 LOGIN: Limpiando tokens del usuario anterior por seguridad');
+
+// Limpiar TODOS los tokens JWT y datos relacionados del usuario anterior
+localStorage.removeItem('jwtToken');
+localStorage.removeItem('jwtTokenUserId');
+localStorage.removeItem('jwtRefreshToken');
+localStorage.removeItem('jwtTokenExpirationTime');
+localStorage.removeItem('jwtExpiresIn');
+localStorage.removeItem('jwtTokenCreatedAt');
+localStorage.removeItem('refreshToken');
+localStorage.removeItem('authToken');
+localStorage.removeItem('userToken');
+localStorage.removeItem('accessToken');
+
+console.log('✅ LOGIN: Tokens anteriores eliminados. Nuevo usuario empezará limpio.');
+
 // Agregar animación de loading al enviar el formulario
 document.getElementById('loginForm').addEventListener('submit', function(e) {
     const submitBtn = this.querySelector('button[type="submit"]');
@@ -94,6 +112,15 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
     
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Iniciando sesión...';
     submitBtn.disabled = true;
+    
+    // CRÍTICO: Limpiar tokens nuevamente antes de enviar el formulario
+    console.log('🔐 LOGIN SUBMIT: Limpieza final de tokens antes de autenticar nuevo usuario');
+    localStorage.removeItem('jwtToken');
+    localStorage.removeItem('jwtTokenUserId');
+    localStorage.removeItem('jwtRefreshToken');
+    localStorage.removeItem('jwtTokenExpirationTime');
+    localStorage.removeItem('jwtExpiresIn');
+    localStorage.removeItem('jwtTokenCreatedAt');
     
     // Si hay un error, restaurar el botón después de un momento
     setTimeout(() => {
