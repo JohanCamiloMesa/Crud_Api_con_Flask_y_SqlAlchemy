@@ -586,28 +586,30 @@ def login_page():
 @users.route('/dashboard')
 def dashboard():
     """
-    Dashboard del usuario autenticado.
-    Muestra información del usuario y opciones disponibles.
+    Dashboard del usuario. 
+    Permite acceso tanto para usuarios autenticados como no autenticados.
+    Los usuarios no autenticados verán opciones para iniciar sesión.
     """
-    # Verificar si el usuario está autenticado
-    if not session.get('is_authenticated'):
-        flash('Debes iniciar sesión para acceder al dashboard', 'error')
-        return redirect(url_for('users.login_page'))
+    user = None
     
-    try:
-        user_id = session.get('user_id')
-        user = UserService.get_user_by_id(user_id)
+    # Si el usuario está autenticado, obtener su información
+    if session.get('is_authenticated'):
+        try:
+            user_id = session.get('user_id')
+            user = UserService.get_user_by_id(user_id)
+            
+            if not user:
+                flash('Usuario no encontrado en la base de datos', 'error')
+                # Limpiar sesión inválida
+                session.clear()
         
-        if not user:
-            flash('Usuario no encontrado', 'error')
-            return redirect(url_for('users.login_page'))
-        
-        return render_template('Dashboard.html', user=user)
+        except Exception as e:
+            logger.error(f'Error al cargar información del usuario: {str(e)}')
+            flash('Error al cargar información del usuario', 'error')
+            # No redirigir, solo mostrar el dashboard sin usuario
     
-    except Exception as e:
-        logger.error(f'Error al cargar dashboard: {str(e)}')
-        flash('Error al cargar dashboard', 'error')
-        return redirect(url_for('users.login_page'))
+    # Renderizar dashboard (con o sin usuario)
+    return render_template('Dashboard.html', user=user)
 
 
 @users.route('/logout')

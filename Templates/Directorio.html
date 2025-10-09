@@ -116,7 +116,6 @@ function deleteAnimeWithAuth(animeId, animeName) {
     
     if (!jwtToken) {
         alert('⚠️ Para eliminar un anime, primero debes generar tu token JWT.\n\n📍 Ve al Dashboard para obtener tu token.');
-        window.location.href = "{{ url_for('users.dashboard') }}";
         return;
     }
     
@@ -131,7 +130,6 @@ function deleteAnimeWithAuth(animeId, animeName) {
               '3️⃣ Ingresar tu token en el modal\n' +
               '4️⃣ Confirmar autenticación\n\n' +
               '🚀 Solo entonces podrás eliminar animes');
-        window.location.href = "{{ url_for('users.dashboard') }}";
         return;
     }
     
@@ -144,13 +142,11 @@ function deleteAnimeWithAuth(animeId, animeName) {
               '✅ Tu usuario actual es ID: ' + currentSessionUserId + '\n\n' +
               '🔐 SOLO puedes usar tokens generados por TU cuenta\n' +
               '🆕 Ve al Dashboard y genera tu propio token');
-        window.location.href = "{{ url_for('users.dashboard') }}";
         return;
     }
     {% else %}
-    // Si no hay usuario en sesión, no permitir eliminar
-    alert('❌ Error: No hay usuario autenticado en la sesión\n\n📍 Inicia sesión primero');
-    window.location.href = "{{ url_for('users.login_page') }}";
+    // Si no hay usuario en sesión, mostrar mensaje sin redirigir
+    alert('❌ Error: No hay usuario autenticado en la sesión\n\n📍 Ve al Dashboard para iniciar sesión y generar tu token JWT');
     return;
     {% endif %}
     
@@ -175,10 +171,7 @@ function deleteAnimeWithAuth(animeId, animeName) {
             window.location.reload();
         } else {
             alert(`Error: ${data.message}`);
-            // Si hay error de autenticación, redirigir al dashboard
-            if (data.message.includes('autenticación')) {
-                window.location.href = "{{ url_for('users.dashboard') }}";
-            }
+            // Mostrar error sin redirigir
         }
     })
     .catch(error => {

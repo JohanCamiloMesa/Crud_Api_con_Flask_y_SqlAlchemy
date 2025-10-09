@@ -20,18 +20,36 @@
             integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" 
             crossorigin="anonymous"></script>
 
-    <!-- Script para cerrar sesión automáticamente al cerrar la página -->
+    <!-- Script para cerrar sesión automáticamente SOLO al cerrar la pestaña/ventana -->
     <script>
-        // === CIERRE DE SESIÓN AUTOMÁTICO AL CERRAR PÁGINA ===
+        // === CIERRE DE SESIÓN AUTOMÁTICO SOLO AL CERRAR PESTAÑA/VENTANA ===
         let sessionActive = true;
+        let isNavigating = false;
         
-        // Detectar cuando el usuario cierra la página/pestaña
+        // Detectar navegación interna (enlaces, formularios, etc.)
+        document.addEventListener('click', function(event) {
+            const target = event.target.closest('a, button, input[type="submit"]');
+            if (target && !target.href?.includes('logout')) {
+                console.log('🔗 Navegación interna detectada - Desactivando auto-logout temporalmente');
+                isNavigating = true;
+                sessionActive = false;
+                
+                // Reactivar auto-logout después de un breve delay
+                setTimeout(() => {
+                    isNavigating = false;
+                    sessionActive = true;
+                    console.log('✅ Auto-logout reactivado después de navegación');
+                }, 1000);
+            }
+        });
+        
+        // Detectar cuando el usuario cierra la página/pestaña REALMENTE
         window.addEventListener('beforeunload', function(event) {
-            if (sessionActive) {
-                console.log('🚪 Detectado cierre de página - Cerrando sesión automáticamente');
+            // Solo cerrar sesión si NO es navegación interna
+            if (sessionActive && !isNavigating) {
+                console.log('🚪 Cierre real de pestaña/ventana detectado - Cerrando sesión automáticamente');
                 
                 // Usar sendBeacon para envío confiable al cerrar página
-                // sendBeacon es más confiable que fetch() cuando la página se cierra
                 const logoutData = new FormData();
                 logoutData.append('auto_logout', 'true');
                 
@@ -44,7 +62,7 @@
                         fetch('/users/auto-logout', {
                             method: 'POST',
                             body: logoutData,
-                            keepalive: true  // Mantener petición viva al cerrar página
+                            keepalive: true
                         }).catch(error => {
                             console.warn('Error en auto-logout:', error);
                         });
@@ -68,16 +86,16 @@
                 } catch (e) {
                     console.warn('Error limpiando localStorage:', e);
                 }
+            } else {
+                console.log('📄 Navegación interna - No cerrar sesión');
             }
         });
         
         // Detectar navegación interna (no cerrar sesión en estos casos)
         window.addEventListener('pagehide', function(event) {
-            // pagehide se ejecuta cuando la página se oculta (incluye navegación)
-            // Solo cerrar sesión si realmente se está cerrando la página
             if (event.persisted) {
                 console.log('📄 Página ocultada pero persistida - No cerrar sesión');
-                sessionActive = false;  // Evitar cierre de sesión en navegación interna
+                sessionActive = false;
             }
         });
         
@@ -90,39 +108,7 @@
             });
         });
         
-        // Manejar múltiples pestañas - usar localStorage para coordinar
-        try {
-            // Generar ID único para esta pestaña
-            const tabId = 'tab_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            
-            // Registrar esta pestaña
-            const openTabs = JSON.parse(localStorage.getItem('app_open_tabs') || '[]');
-            openTabs.push(tabId);
-            localStorage.setItem('app_open_tabs', JSON.stringify(openTabs));
-            
-            // Al cerrar página, verificar si es la última pestaña
-            window.addEventListener('beforeunload', function() {
-                try {
-                    const currentTabs = JSON.parse(localStorage.getItem('app_open_tabs') || '[]');
-                    const remainingTabs = currentTabs.filter(id => id !== tabId);
-                    localStorage.setItem('app_open_tabs', JSON.stringify(remainingTabs));
-                    
-                    if (remainingTabs.length === 0) {
-                        console.log('� Última pestaña cerrada - Auto-logout será más agresivo');
-                        // La lógica de auto-logout ya maneja esto
-                    } else {
-                        console.log(`📑 ${remainingTabs.length} pestañas aún abiertas - Auto-logout suave`);
-                    }
-                } catch (e) {
-                    console.warn('Error gestionando pestañas múltiples:', e);
-                }
-            });
-            
-            console.log(`🔐 Sistema de auto-logout activado (Pestaña: ${tabId})`);
-        } catch (e) {
-            console.warn('Error configurando gestión de pestañas:', e);
-            console.log('🔐 Sistema de auto-logout básico activado');
-        }
+        console.log('🔐 Sistema de auto-logout mejorado activado - Solo se activa al cerrar pestaña/ventana');
     </script>
 </body>
 </html>

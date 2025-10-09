@@ -14,6 +14,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_CONNECTION_URI
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = "mysecretkey"
 
+# Configure session lifetime - las sesiones durarán 24 horas
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)
+
 # Configure JWT
 app.config['JWT_SECRET_KEY'] = 'tu_clave_secreta_super_segura_jwt_cambiar_en_produccion'
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(seconds= 3600)  # Token expira en 1 hora

@@ -8,7 +8,7 @@ crear las tablas necesarias y ejecutar la aplicación Flask.
 # Importaciones necesarias
 from app import app  # Instancia principal de Flask
 from Utils.database import db  # Instancia de SQLAlchemy
-from Models.anime_model import anime, Category  # Modelos de base de datos
+from Models.anime_model import anime  # Modelos de base de datos
 from src.dbcreate import init_database  # Función para inicializar la base de datos
 
 # Inicializar la base de datos MySQL (crear DB si no existe)
