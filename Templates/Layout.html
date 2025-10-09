@@ -22,6 +22,81 @@
             integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" 
             crossorigin="anonymous"></script>
 
+    <!-- Script para desactivar solo las flechas de navegación del navegador -->
+    <script>
+        // === BLOQUEO EFECTIVO DE FLECHAS DE NAVEGACIÓN ===
+        
+        (function() {
+            // Configurar inmediatamente al cargar el script
+            history.pushState(null, null, location.href);
+            
+            // Función que se ejecuta cada vez que se intenta navegar hacia atrás
+            window.onpopstate = function(event) {
+                // Inmediatamente volver a empujar el estado actual
+                history.pushState(null, null, location.href);
+                
+                // Mostrar alerta
+                alert('🚫 Navegación hacia atrás desactivada por seguridad.\n\n' +
+                      '📍 Usa los enlaces de la aplicación para navegar.');
+            };
+            
+            // Configuración adicional cuando el DOM esté listo
+            document.addEventListener('DOMContentLoaded', function() {
+                // Asegurar que siempre hay un estado en el historial
+                if (window.history.length === 1) {
+                    history.pushState(null, null, location.href);
+                }
+            });
+            
+            // Método alternativo usando addEventListener
+            window.addEventListener('popstate', function(event) {
+                // Prevenir el comportamiento predeterminado
+                event.preventDefault();
+                
+                // Forzar a quedarse en la página actual
+                history.pushState(null, null, location.href);
+                
+                console.log('🚫 Intento de navegación hacia atrás bloqueado');
+            }, false);
+            
+            // Bloquear atajos de teclado para navegación
+            document.addEventListener('keydown', function(event) {
+                // Alt + Flecha Izquierda (Atrás)
+                if (event.altKey && event.keyCode === 37) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    alert('🚫 Atajo Alt + ← desactivado');
+                    return false;
+                }
+                
+                // Alt + Flecha Derecha (Adelante)  
+                if (event.altKey && event.keyCode === 39) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    alert('🚫 Atajo Alt + → desactivado');
+                    return false;
+                }
+                
+                // Backspace para navegación (no en inputs)
+                if (event.keyCode === 8 && 
+                    !event.target.matches('input, textarea, [contenteditable="true"]')) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    alert('🚫 Navegación con Backspace desactivada');
+                    return false;
+                }
+            }, true);
+            
+            // Mantener el bloqueo activo de forma continua
+            setInterval(function() {
+                if (history.length === 1) {
+                    history.pushState(null, null, location.href);
+                }
+            }, 1000);
+            
+        })();
+    </script>
+
     <!-- Script para cerrar sesión automáticamente SOLO al cerrar la pestaña/ventana -->
     <script>
         // === CIERRE DE SESIÓN AUTOMÁTICO SOLO AL CERRAR PESTAÑA/VENTANA ===
