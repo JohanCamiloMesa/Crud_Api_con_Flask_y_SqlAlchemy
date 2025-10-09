@@ -10,16 +10,27 @@
             <button class="btn btn-outline-light" type="submit">Buscar</button>
         </form>
         
-        <!-- Authentication links - Solo mostrar si está autenticado -->
-        {% if session.get('is_authenticated') %}
+        <!-- Navigation links -->
         <ul class="navbar-nav me-3">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('animes.home') }}">
+                    <i class="fas fa-home"></i> Inicio
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('animes.directory') }}">
+                    <i class="fas fa-list"></i> Directorio
+                </a>
+            </li>
+            <!-- Authentication links - Solo mostrar si está autenticado -->
+            {% if session.get('is_authenticated') %}
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('users.dashboard') }}">
                     <i class="fas fa-tachometer-alt"></i> Dashboard
                 </a>
             </li>
+            {% endif %}
         </ul>
-        {% endif %}
         
         <span class="navbar-text">
             Realizado por: Johan Camilo Mesa
