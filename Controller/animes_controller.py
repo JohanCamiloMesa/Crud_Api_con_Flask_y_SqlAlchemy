@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from Models.anime_model import anime, GenreCategory
 from Services.anime_service import (
@@ -11,6 +11,11 @@ animes = Blueprint('animes', __name__)
 
 @animes.route("/")
 def home():
+    # Si el usuario está autenticado, redirigir al dashboard
+    if session.get('is_authenticated') and session.get('user_id'):
+        return redirect(url_for('users.dashboard'))
+    
+    # Si no está autenticado, mostrar la página de inicio
     animes_list = anime.query.all()
     genres = GenreCategory.query.all()
     return render_template("Index.html", animes=animes_list, genres=genres)
@@ -50,8 +55,18 @@ def directory():
     
     animes_list = query.all()
     
+    # CRÍTICO: Obtener información del usuario autenticado para validaciones de seguridad
+    user = None
+    if session.get('is_authenticated') and session.get('user_id'):
+        from Services.user_service import UserService
+        try:
+            user = UserService.get_user_by_id(session.get('user_id'))
+        except Exception as e:
+            print(f"Error obteniendo usuario: {e}")
+    
     return render_template("Directorio.html", 
                          animes=animes_list,
+                         user=user,  # Pasar información del usuario
                          filters={
                              'genre': genre_filter,
                              'year': year_filter,
@@ -68,10 +83,20 @@ def search():
     else:
         animes_list = anime.query.all()
     
+    # CRÍTICO: Obtener información del usuario autenticado para validaciones de seguridad
+    user = None
+    if session.get('is_authenticated') and session.get('user_id'):
+        from Services.user_service import UserService
+        try:
+            user = UserService.get_user_by_id(session.get('user_id'))
+        except Exception as e:
+            print(f"Error obteniendo usuario: {e}")
+    
     # Provide empty filters to avoid template errors
     return render_template("Directorio.html", 
                          animes=animes_list, 
                          search_query=query,
+                         user=user,  # Pasar información del usuario
                          filters={
                              'genre': '',
                              'year': '',
@@ -80,11 +105,26 @@ def search():
                              'order': 'default'
                          })
 
-@animes.route("/new", methods=["POST"])
+@animes.route("/new", methods=["GET", "POST"])
 def add_anime():
+    if request.method == "GET":
+        # Mostrar formulario para agregar anime
+        if not session.get('is_authenticated'):
+            flash('Debes iniciar sesión para agregar animes', 'error')
+            return redirect(url_for('users.login_page'))
+        
+        # Usuario autenticado puede ver el formulario
+        genres = GenreCategory.query.all()
+        return render_template("Index.html", animes=[], genres=genres, show_form_only=True)
+    
+    # POST: Procesar formulario
+    if not session.get('is_authenticated'):
+        flash('Debes iniciar sesión para agregar animes', 'error')
+        return redirect(url_for('users.login_page'))
+    
     success, message = service_create_anime()
     flash(message, "success" if success else "error")
-    return redirect(url_for('animes.home'))
+    return redirect(url_for('animes.directory'))
 
 @animes.route("/update/<id>", methods=["GET", "POST"])
 def update_anime(id):

@@ -115,10 +115,44 @@ function deleteAnimeWithAuth(animeId, animeName) {
     const jwtToken = localStorage.getItem('jwtToken');
     
     if (!jwtToken) {
-        alert('Para eliminar un anime, debes autenticarte primero con tu token JWT.\n\nVe al Dashboard para ingresar tu token.');
+        alert('⚠️ Para eliminar un anime, primero debes generar tu token JWT.\n\n📍 Ve al Dashboard para obtener tu token.');
         window.location.href = "{{ url_for('users.dashboard') }}";
         return;
     }
+    
+    // CRÍTICO: Verificar si el usuario se ha AUTENTICADO con el token
+    const jwtTokenUserId = localStorage.getItem('jwtTokenUserId');
+    
+    if (!jwtTokenUserId) {
+        alert('🔐 Token encontrado pero NO AUTENTICADO\n\n' +
+              '❌ Para eliminar animes debes:\n' +
+              '1️⃣ Ir al Dashboard\n' +
+              '2️⃣ Hacer clic en "Autenticarse"\n' +
+              '3️⃣ Ingresar tu token en el modal\n' +
+              '4️⃣ Confirmar autenticación\n\n' +
+              '🚀 Solo entonces podrás eliminar animes');
+        window.location.href = "{{ url_for('users.dashboard') }}";
+        return;
+    }
+    
+    // VALIDACIÓN ADICIONAL: Verificar que el token pertenece al usuario actual de la sesión
+    {% if user and user.id %}
+    const currentSessionUserId = '{{ user.id }}';
+    if (jwtTokenUserId !== currentSessionUserId) {
+        alert('🚫 ERROR DE SEGURIDAD: Token no válido para tu usuario\n\n' +
+              '❌ El token pertenece al usuario ID: ' + jwtTokenUserId + '\n' +
+              '✅ Tu usuario actual es ID: ' + currentSessionUserId + '\n\n' +
+              '🔐 SOLO puedes usar tokens generados por TU cuenta\n' +
+              '🆕 Ve al Dashboard y genera tu propio token');
+        window.location.href = "{{ url_for('users.dashboard') }}";
+        return;
+    }
+    {% else %}
+    // Si no hay usuario en sesión, no permitir eliminar
+    alert('❌ Error: No hay usuario autenticado en la sesión\n\n📍 Inicia sesión primero');
+    window.location.href = "{{ url_for('users.login_page') }}";
+    return;
+    {% endif %}
     
     // Confirmar eliminación
     if (!confirm(`¿Estás seguro de que quieres eliminar el anime "${animeName}"?`)) {

@@ -19,5 +19,110 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" 
             integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" 
             crossorigin="anonymous"></script>
+
+    <!-- Script para cerrar sesión automáticamente al cerrar la página -->
+    <script>
+        // === CIERRE DE SESIÓN AUTOMÁTICO AL CERRAR PÁGINA ===
+        let sessionActive = true;
+        
+        // Detectar cuando el usuario cierra la página/pestaña
+        window.addEventListener('beforeunload', function(event) {
+            if (sessionActive) {
+                console.log('🚪 Detectado cierre de página - Cerrando sesión automáticamente');
+                
+                // Usar sendBeacon para envío confiable al cerrar página
+                // sendBeacon es más confiable que fetch() cuando la página se cierra
+                const logoutData = new FormData();
+                logoutData.append('auto_logout', 'true');
+                
+                try {
+                    // Intentar con sendBeacon (más confiable)
+                    const beaconSent = navigator.sendBeacon('/users/auto-logout', logoutData);
+                    
+                    if (!beaconSent) {
+                        // Fallback con fetch síncrono si sendBeacon falla
+                        fetch('/users/auto-logout', {
+                            method: 'POST',
+                            body: logoutData,
+                            keepalive: true  // Mantener petición viva al cerrar página
+                        }).catch(error => {
+                            console.warn('Error en auto-logout:', error);
+                        });
+                    }
+                    
+                    console.log('✅ Solicitud de cierre de sesión enviada');
+                } catch (error) {
+                    console.error('❌ Error al enviar auto-logout:', error);
+                }
+                
+                // Limpiar localStorage por seguridad adicional
+                try {
+                    localStorage.removeItem('jwtToken');
+                    localStorage.removeItem('jwtTokenUserId');
+                    localStorage.removeItem('jwtRefreshToken');
+                    localStorage.removeItem('jwtTokenExpirationTime');
+                    localStorage.removeItem('jwtExpiresIn');
+                    localStorage.removeItem('jwtTokenCreatedAt');
+                    sessionStorage.clear();
+                    console.log('🧹 localStorage limpiado por seguridad');
+                } catch (e) {
+                    console.warn('Error limpiando localStorage:', e);
+                }
+            }
+        });
+        
+        // Detectar navegación interna (no cerrar sesión en estos casos)
+        window.addEventListener('pagehide', function(event) {
+            // pagehide se ejecuta cuando la página se oculta (incluye navegación)
+            // Solo cerrar sesión si realmente se está cerrando la página
+            if (event.persisted) {
+                console.log('📄 Página ocultada pero persistida - No cerrar sesión');
+                sessionActive = false;  // Evitar cierre de sesión en navegación interna
+            }
+        });
+        
+        // Desactivar auto-logout en logout manual
+        const logoutLinks = document.querySelectorAll('a[href*="logout"]');
+        logoutLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                console.log('🚪 Logout manual detectado - Desactivando auto-logout');
+                sessionActive = false;
+            });
+        });
+        
+        // Manejar múltiples pestañas - usar localStorage para coordinar
+        try {
+            // Generar ID único para esta pestaña
+            const tabId = 'tab_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            
+            // Registrar esta pestaña
+            const openTabs = JSON.parse(localStorage.getItem('app_open_tabs') || '[]');
+            openTabs.push(tabId);
+            localStorage.setItem('app_open_tabs', JSON.stringify(openTabs));
+            
+            // Al cerrar página, verificar si es la última pestaña
+            window.addEventListener('beforeunload', function() {
+                try {
+                    const currentTabs = JSON.parse(localStorage.getItem('app_open_tabs') || '[]');
+                    const remainingTabs = currentTabs.filter(id => id !== tabId);
+                    localStorage.setItem('app_open_tabs', JSON.stringify(remainingTabs));
+                    
+                    if (remainingTabs.length === 0) {
+                        console.log('� Última pestaña cerrada - Auto-logout será más agresivo');
+                        // La lógica de auto-logout ya maneja esto
+                    } else {
+                        console.log(`📑 ${remainingTabs.length} pestañas aún abiertas - Auto-logout suave`);
+                    }
+                } catch (e) {
+                    console.warn('Error gestionando pestañas múltiples:', e);
+                }
+            });
+            
+            console.log(`🔐 Sistema de auto-logout activado (Pestaña: ${tabId})`);
+        } catch (e) {
+            console.warn('Error configurando gestión de pestañas:', e);
+            console.log('🔐 Sistema de auto-logout básico activado');
+        }
+    </script>
 </body>
 </html>

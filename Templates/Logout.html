@@ -19,17 +19,47 @@
 </div>
 
 <script>
-// Limpiar todos los tokens almacenados en localStorage
+{% if keep_jwt %}
+// Mantener los tokens JWT activos (solo limpiar sesión web)
+console.log('JWT mantiene su validez por 1 hora más');
+
+// Solo limpiar datos de sesión web específicos, NO el JWT
+sessionStorage.clear();
+
+// Mostrar mensaje informativo
+document.querySelector('.card-body p').textContent = 'Sesión web cerrada. Tu token JWT sigue activo.';
+{% else %}
+// === LIMPIEZA COMPLETA DE SEGURIDAD ===
+console.log('🔐 LOGOUT: Limpiando TODOS los tokens por seguridad');
+
+// Limpiar TODOS los tokens JWT y datos relacionados
 localStorage.removeItem('jwtToken');
 localStorage.removeItem('jwtTokenUserId');
+localStorage.removeItem('jwtRefreshToken');
+localStorage.removeItem('jwtTokenExpirationTime');
+localStorage.removeItem('jwtExpiresIn');
+localStorage.removeItem('jwtTokenCreatedAt');
+localStorage.removeItem('refreshToken');
 
-// Limpiar cualquier otro dato relacionado con la sesión
+// Limpiar cualquier otro dato de autenticación
+localStorage.removeItem('authToken');
+localStorage.removeItem('userToken');
+localStorage.removeItem('accessToken');
+
+// Limpiar completamente localStorage y sessionStorage
 localStorage.clear();
+sessionStorage.clear();
 
-// Redireccionar después de 2 segundos
+// Actualizar mensaje en pantalla
+document.querySelector('.card-body p').textContent = '🔐 Tokens eliminados por seguridad. El siguiente usuario estará completamente desautenticado.';
+
+console.log('✅ LOGOUT: Limpieza completa realizada');
+{% endif %}
+
+// Redireccionar después de 3 segundos para que el usuario vea el mensaje
 setTimeout(() => {
     window.location.href = '{{ redirect_url }}';
-}, 2000);
+}, 3000);
 </script>
 
 <!-- Font Awesome para iconos -->

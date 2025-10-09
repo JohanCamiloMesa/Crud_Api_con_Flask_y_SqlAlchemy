@@ -7,8 +7,15 @@ que el controlador de animes existente.
 """
 
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for, flash, session
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import (
+    create_access_token, 
+    create_refresh_token, 
+    jwt_required, 
+    get_jwt_identity,
+    get_jwt
+)
 from Services.user_service import UserService
+from datetime import datetime
 import logging
 
 # Configurar logging
@@ -188,16 +195,15 @@ def login():
         user = UserService.authenticate(username, password)
         
         if user:
-            # Crear token JWT
-            access_token = create_access_token(identity=str(user.id))
+            # Solo autenticar usuario, NO generar tokens automáticamente
             logger.info(f'Login exitoso para usuario: {username}')
             return jsonify({
-                'access_token': access_token,
                 'user': {
                     'id': user.id,
                     'username': user.username
                 },
-                'message': 'Login exitoso'
+                'authenticated': True,
+                'message': 'Usuario autenticado exitosamente. Use /users/generate-token para obtener el token JWT.'
             }), 200
 
         logger.warning(f'Login fallido para usuario: {username}')
@@ -206,6 +212,181 @@ def login():
     except Exception as e:
         logger.exception("Error en login de usuario")
         return jsonify({'error': 'Error interno en login', 'detail': str(e)}), 500
+
+
+@users.route('/generate-token', methods=['POST'])
+def generate_token():
+    """
+    Generar token JWT manualmente para usuario autenticado en sesión.
+    
+    El usuario debe estar previamente autenticado via login web o API.
+    Solo entonces puede solicitar su token JWT que durará 1 hora.
+    ---
+    tags:
+      - Usuarios
+    responses:
+      200:
+        description: Token generado exitosamente
+        schema:
+          type: object
+          properties:
+            access_token:
+              type: string
+              description: Token JWT válido por 1 hora
+            refresh_token:
+              type: string
+              description: Token para renovar el access_token
+            expires_in:
+              type: integer
+              example: 3600
+              description: Tiempo de expiración en segundos
+            token_created_at:
+              type: string
+              description: Timestamp de cuando se creó el token
+            message:
+              type: string
+              example: Token JWT generado exitosamente
+      401:
+        description: Usuario no autenticado
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: Debe estar autenticado para generar token
+    """
+    try:
+        # Verificar si el usuario está autenticado en sesión
+        user_id = session.get('user_id')
+        username = session.get('username')
+        is_authenticated = session.get('is_authenticated')
+        
+        if not user_id or not is_authenticated:
+            return jsonify({
+                'error': 'Debe estar autenticado para generar token',
+                'message': 'Por favor inicie sesión primero'
+            }), 401
+        
+        # Generar tokens JWT (el tiempo de 1 hora comienza AHORA)
+        access_token = create_access_token(identity=str(user_id))
+        refresh_token = create_refresh_token(identity=str(user_id))
+        token_created_at = datetime.now().isoformat()
+        
+        # Guardar información del token en la sesión
+        session['access_token'] = access_token
+        session['refresh_token'] = refresh_token
+        session['token_expires_in'] = 3600 
+        session['token_created_at'] = token_created_at
+        
+        logger.info(f'Token JWT generado manualmente para usuario: {username}')
+        
+        return jsonify({
+            'access_token': access_token,
+            'refresh_token': refresh_token,
+            'expires_in':3600,  # 1 hora en segundos
+            'token_created_at': token_created_at,
+            'user': {
+                'id': user_id,
+                'username': username
+            },
+            'message': 'Token JWT generado exitosamente. El tiempo de 1 hora comienza ahora.'
+        }), 200
+        
+    except Exception as e:
+        logger.exception("Error al generar token manualmente")
+        return jsonify({
+            'error': 'Error interno al generar token',
+            'detail': str(e)
+        }), 500
+
+
+@users.route('/refresh', methods=['POST'])
+@jwt_required(refresh=True)
+def refresh():
+    """
+    Renovar access token usando refresh token
+    ---
+    tags:
+      - Usuarios
+    security:
+      - Bearer: []
+    responses:
+      200:
+        description: Token renovado exitosamente
+        schema:
+          type: object
+          properties:
+            access_token:
+              type: string
+              description: Nuevo access token válido por 1 hora
+            expires_in:
+              type: integer
+              example: 3600
+              description: Tiempo de expiración en segundos
+            message:
+              type: string
+              example: Token renovado exitosamente
+      401:
+        description: Refresh token inválido o expirado
+    """
+    try:
+        current_user_id = get_jwt_identity()
+        new_token = create_access_token(identity=current_user_id)
+        
+        logger.info(f'Token renovado para usuario ID: {current_user_id}')
+        return jsonify({
+            'access_token': new_token,
+            'expires_in': 3600,  # 1 hora en segundos
+            'message': 'Token renovado exitosamente'
+        }), 200
+        
+    except Exception as e:
+        logger.exception("Error al renovar token")
+        return jsonify({'error': 'Error interno al renovar token', 'detail': str(e)}), 500
+
+
+@users.route('/token-status', methods=['GET'])
+@jwt_required()
+def token_status():
+    """
+    Verificar el estado del token JWT actual
+    ---
+    tags:
+      - Usuarios
+    security:
+      - Bearer: []
+    responses:
+      200:
+        description: Estado del token
+        schema:
+          type: object
+          properties:
+            user_id:
+              type: string
+              description: ID del usuario
+            token_valid:
+              type: boolean
+              example: true
+            message:
+              type: string
+              example: Token válido
+      401:
+        description: Token inválido o expirado
+    """
+    try:
+        current_user_id = get_jwt_identity()
+        jwt_claims = get_jwt()
+        
+        return jsonify({
+            'user_id': current_user_id,
+            'token_valid': True,
+            'expires_at': jwt_claims.get('exp'),
+            'message': 'Token válido'
+        }), 200
+        
+    except Exception as e:
+        logger.exception("Error al verificar estado del token")
+        return jsonify({'error': 'Error al verificar token', 'detail': str(e)}), 500
 
 
 @users.route('/', methods=['GET'])
@@ -379,7 +560,7 @@ def login_page():
         user = UserService.authenticate(username, password)
         
         if user:
-            # Guardar información del usuario en la sesión
+            # Guardar información del usuario en la sesión (sin tokens JWT todavía)
             session['user_id'] = user.id
             session['username'] = user.username
             session['is_authenticated'] = True
@@ -389,7 +570,7 @@ def login_page():
                 session.permanent = True
             
             logger.info(f'Login web exitoso para usuario: {username}')
-            flash(f'¡Bienvenido {user.username}!', 'success')
+            flash(f'¡Bienvenido {user.username}! Usa el dashboard para obtener tu token JWT.', 'success')
             return redirect(url_for('users.dashboard'))
 
         logger.warning(f'Login web fallido para usuario: {username}')
@@ -432,17 +613,63 @@ def dashboard():
 @users.route('/logout')
 def logout():
     """
-    Cerrar sesión del usuario y limpiar tokens almacenados.
+    Cerrar sesión del usuario y limpiar COMPLETAMENTE todos los tokens JWT.
+    
+    SEGURIDAD CRÍTICA: Al cerrar sesión se debe limpiar localStorage para evitar
+    que el siguiente usuario pueda usar tokens del usuario anterior.
     """
     username = session.get('username', 'Usuario')
     
-    # Limpiar la sesión
+    # Limpiar completamente la sesión web
     session.clear()
     
-    flash(f'¡Hasta luego {username}!', 'success')
+    flash(f'¡Hasta luego {username}! Todos los tokens han sido eliminados por seguridad.', 'info')
     
-    # Renderizar una página de logout que limpie el localStorage
-    return render_template('Logout.html', redirect_url=url_for('animes.home'))
+    # Renderizar página de logout que LIMPIE completamente el localStorage
+    return render_template('Logout.html', 
+                         redirect_url=url_for('animes.home'),
+                         keep_jwt=False)  # CRÍTICO: Limpiar todos los tokens JWT
+
+
+@users.route('/auto-logout', methods=['POST'])
+def auto_logout():
+    """
+    Endpoint para cerrar sesión automáticamente cuando se cierra la página.
+    
+    Este endpoint se llama desde JavaScript cuando se detecta que el usuario
+    está cerrando la página/pestaña del navegador. Permite un cierre de sesión
+    limpio sin requerir interacción del usuario.
+    """
+    try:
+        username = session.get('username', 'Usuario')
+        user_id = session.get('user_id', 'N/A')
+        
+        if session.get('is_authenticated'):
+            logger.info(f'Auto-logout ejecutado para usuario: {username} (ID: {user_id})')
+            
+            # Limpiar completamente la sesión web
+            session.clear()
+            
+            return jsonify({
+                'success': True,
+                'message': f'Sesión de {username} cerrada automáticamente',
+                'auto_logout': True
+            }), 200
+        else:
+            # No había sesión activa
+            return jsonify({
+                'success': True,
+                'message': 'No había sesión activa para cerrar',
+                'auto_logout': False
+            }), 200
+            
+    except Exception as e:
+        logger.exception(f"Error en auto-logout: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Error interno en auto-logout',
+            'detail': str(e)
+        }), 500
 
 
 @users.route('/profile-page')
@@ -501,3 +728,83 @@ def get_token():
         logger.error(f'Error al generar token: {str(e)}')
         flash('Error al generar token', 'error')
         return redirect(url_for('users.dashboard'))
+
+
+@users.route('/protected', methods=['GET'])
+@jwt_required()
+def protected():
+    """
+    Endpoint protegido para verificar autenticación JWT
+    
+    Este endpoint verifica que el token JWT sea válido y devuelve
+    la información del usuario autenticado. Es usado por el frontend
+    para validar tokens y verificar la autenticación.
+    ---
+    tags:
+      - Usuarios
+    security:
+      - Bearer: []
+    responses:
+      200:
+        description: Token válido y usuario autenticado
+        schema:
+          type: object
+          properties:
+            authenticated:
+              type: boolean
+              example: true
+            user_id:
+              type: string
+              description: ID del usuario autenticado
+            message:
+              type: string
+              example: Token válido y usuario autenticado
+            token_valid:
+              type: boolean
+              example: true
+      401:
+        description: Token inválido, expirado o no proporcionado
+        schema:
+          type: object
+          properties:
+            error:
+              type: string
+              example: Token inválido o expirado
+            authenticated:
+              type: boolean
+              example: false
+    """
+    try:
+        # get_jwt_identity() devuelve el user_id que se guardó al crear el token
+        current_user_id = get_jwt_identity()
+        
+        # Verificar que el usuario existe en la base de datos
+        user = UserService.get_user_by_id(int(current_user_id))
+        
+        if not user:
+            logger.warning(f"Token válido pero usuario {current_user_id} no existe en BD")
+            return jsonify({
+                'error': 'Usuario no encontrado en la base de datos',
+                'authenticated': False,
+                'token_valid': False
+            }), 401
+        
+        # Token válido y usuario existe
+        logger.info(f"Acceso autorizado para usuario: {user.username} (ID: {current_user_id})")
+        
+        return jsonify({
+            'authenticated': True,
+            'user_id': current_user_id,
+            'username': user.username,
+            'message': 'Token válido y usuario autenticado',
+            'token_valid': True
+        }), 200
+        
+    except Exception as e:
+        logger.exception(f"Error en endpoint protegido: {str(e)}")
+        return jsonify({
+            'error': 'Error interno de autenticación',
+            'authenticated': False,
+            'token_valid': False,
+            'detail': str(e)
+        }), 401
