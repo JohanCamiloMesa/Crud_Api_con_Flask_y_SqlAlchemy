@@ -24,107 +24,49 @@
 
     <!-- Script para desactivar solo las flechas de navegación del navegador -->
     <script>
-        // === BLOQUEO EFECTIVO DE FLECHAS DE NAVEGACIÓN ===
-        
-        (function() {
-            // Configurar inmediatamente al cargar el script
-            history.pushState(null, null, location.href);
-            
-            // Función que se ejecuta cada vez que se intenta navegar hacia atrás
-            window.onpopstate = function(event) {
-                // Inmediatamente volver a empujar el estado actual
-                history.pushState(null, null, location.href);
-                
-                // Mostrar alerta
-                alert('🚫 Navegación hacia atrás desactivada por seguridad.\n\n' +
-                      '📍 Usa los enlaces de la aplicación para navegar.');
-            };
-            
-            // Configuración adicional cuando el DOM esté listo
-            document.addEventListener('DOMContentLoaded', function() {
-                // Asegurar que siempre hay un estado en el historial
-                if (window.history.length === 1) {
-                    history.pushState(null, null, location.href);
-                }
-            });
-            
-            // Método alternativo usando addEventListener
-            window.addEventListener('popstate', function(event) {
-                // Prevenir el comportamiento predeterminado
-                event.preventDefault();
-                
-                // Forzar a quedarse en la página actual
-                history.pushState(null, null, location.href);
-                
-                console.log('🚫 Intento de navegación hacia atrás bloqueado');
-            }, false);
-            
-            // Bloquear atajos de teclado para navegación
-            document.addEventListener('keydown', function(event) {
-                // Alt + Flecha Izquierda (Atrás)
-                if (event.altKey && event.keyCode === 37) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    alert('🚫 Atajo Alt + ← desactivado');
-                    return false;
-                }
-                
-                // Alt + Flecha Derecha (Adelante)  
-                if (event.altKey && event.keyCode === 39) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    alert('🚫 Atajo Alt + → desactivado');
-                    return false;
-                }
-                
-                // Backspace para navegación (no en inputs)
-                if (event.keyCode === 8 && 
-                    !event.target.matches('input, textarea, [contenteditable="true"]')) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    alert('🚫 Navegación con Backspace desactivada');
-                    return false;
-                }
-            }, true);
-            
-            // Mantener el bloqueo activo de forma continua
-            setInterval(function() {
-                if (history.length === 1) {
-                    history.pushState(null, null, location.href);
-                }
-            }, 1000);
-            
-        })();
-    </script>
-
-    <!-- Script para cerrar sesión automáticamente SOLO al cerrar la pestaña/ventana -->
-    <script>
-        // === CIERRE DE SESIÓN AUTOMÁTICO SOLO AL CERRAR PESTAÑA/VENTANA ===
+        // === CIERRE DE SESIÓN AUTOMÁTICO AL CERRAR PÁGINA ===
         let sessionActive = true;
-        let isNavigating = false;
+        let isInternalNavigation = false;
         
-        // Detectar navegación interna (enlaces, formularios, etc.)
+        // Detectar navegación interna (clics en enlaces del sitio)
         document.addEventListener('click', function(event) {
-            const target = event.target.closest('a, button, input[type="submit"]');
-            if (target && !target.href?.includes('logout')) {
-                console.log('🔗 Navegación interna detectada - Desactivando auto-logout temporalmente');
-                isNavigating = true;
-                sessionActive = false;
+            const target = event.target.closest('a');
+            if (target && target.href) {
+                const currentHost = window.location.host;
+                const linkHost = new URL(target.href, window.location.href).host;
                 
-                // Reactivar auto-logout después de un breve delay
-                setTimeout(() => {
-                    isNavigating = false;
-                    sessionActive = true;
-                    console.log('✅ Auto-logout reactivado después de navegación');
-                }, 1000);
+                // Si es un enlace interno, marcar como navegación interna
+                if (currentHost === linkHost) {
+                    isInternalNavigation = true;
+                    console.log('🔗 Navegación interna detectada - No cerrar sesión');
+                }
+            }
+            
+            // También detectar clics en botones de submit de formularios
+            const button = event.target.closest('button[type="submit"], input[type="submit"]');
+            if (button) {
+                isInternalNavigation = true;
+                console.log('📝 Submit de formulario detectado - No cerrar sesión');
             }
         });
         
-        // Detectar cuando el usuario cierra la página/pestaña REALMENTE
+        // Detectar envío de formularios
+        document.addEventListener('submit', function(event) {
+            isInternalNavigation = true;
+            console.log('📋 Envío de formulario detectado - No cerrar sesión');
+        });
+        
+        // Detectar cuando el usuario cierra la página/pestaña (solo si NO es navegación interna)
         window.addEventListener('beforeunload', function(event) {
-            // Solo cerrar sesión si NO es navegación interna
-            if (sessionActive && !isNavigating) {
-                console.log('🚪 Cierre real de pestaña/ventana detectado - Cerrando sesión automáticamente');
+            // NO cerrar sesión si es navegación interna o submit de formulario
+            if (isInternalNavigation) {
+                console.log('📄 Navegación interna - Sesión se mantiene');
+                isInternalNavigation = false;  // Reset para próxima navegación
+                return;
+            }
+            
+            if (sessionActive) {
+                console.log('🚪 Detectado cierre de página - Cerrando sesión automáticamente');
                 
                 // Usar sendBeacon para envío confiable al cerrar página
                 const logoutData = new FormData();
