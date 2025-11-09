@@ -297,7 +297,7 @@
                             <textarea 
                                 id="modalTokenDisplay" 
                                 class="form-control" 
-                                rows="5" 
+                                rows="8" 
                                 readonly 
                                 style="font-family: monospace; font-size: 12px; background-color: #f8f9fa; border: 2px solid #28a745;">
                             </textarea>
@@ -1065,22 +1065,6 @@ function showTokenInModal(token) {
             const tokenUserId = payload.sub || payload.identity;
             const currentUserId = '{{ user.id }}';
             const currentUsername = '{{ user.username }}';
-            
-            // Agregar información de usuario al modal
-            const userInfo = document.createElement('div');
-            userInfo.className = 'alert alert-info mt-2';
-            userInfo.innerHTML = `
-                <i class="fas fa-user-shield"></i> 
-                <strong>Token Personal Generado</strong><br>
-                👤 Propietario: ${currentUsername} (ID: ${currentUserId})<br>
-                🔐 Solo TÚ puedes usar este token para eliminar animes<br>
-                ⏰ Válido por 1 hora desde ahora
-            `;
-            
-            // Insertar después del textarea si no existe ya
-            if (!modalTokenDisplay.parentNode.querySelector('.alert-info')) {
-                modalTokenDisplay.parentNode.insertBefore(userInfo, modalTokenDisplay.nextSibling);
-            }
             
         } catch (e) {
             console.warn('No se pudo decodificar token para mostrar info de usuario:', e);

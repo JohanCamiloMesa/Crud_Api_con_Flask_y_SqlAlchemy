@@ -24,9 +24,45 @@
     <script>
         // === CIERRE DE SESIÓN AUTOMÁTICO AL CERRAR PÁGINA ===
         let sessionActive = true;
+        let isInternalNavigation = false;
         
-        // Detectar cuando el usuario cierra la página/pestaña
+        // Detectar navegación interna (clics en enlaces del sitio)
+        document.addEventListener('click', function(event) {
+            const target = event.target.closest('a');
+            if (target && target.href) {
+                const currentHost = window.location.host;
+                const linkHost = new URL(target.href, window.location.href).host;
+                
+                // Si es un enlace interno, marcar como navegación interna
+                if (currentHost === linkHost) {
+                    isInternalNavigation = true;
+                    console.log('🔗 Navegación interna detectada - No cerrar sesión');
+                }
+            }
+            
+            // También detectar clics en botones de submit de formularios
+            const button = event.target.closest('button[type="submit"], input[type="submit"]');
+            if (button) {
+                isInternalNavigation = true;
+                console.log('📝 Submit de formulario detectado - No cerrar sesión');
+            }
+        });
+        
+        // Detectar envío de formularios
+        document.addEventListener('submit', function(event) {
+            isInternalNavigation = true;
+            console.log('📋 Envío de formulario detectado - No cerrar sesión');
+        });
+        
+        // Detectar cuando el usuario cierra la página/pestaña (solo si NO es navegación interna)
         window.addEventListener('beforeunload', function(event) {
+            // NO cerrar sesión si es navegación interna o submit de formulario
+            if (isInternalNavigation) {
+                console.log('📄 Navegación interna - Sesión se mantiene');
+                isInternalNavigation = false;  // Reset para próxima navegación
+                return;
+            }
+            
             if (sessionActive) {
                 console.log('🚪 Detectado cierre de página - Cerrando sesión automáticamente');
                 

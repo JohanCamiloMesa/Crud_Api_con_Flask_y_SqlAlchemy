@@ -1,0 +1,59 @@
+{% extends 'Layout.html' %}
+
+{% block title %}Manga - Inicio{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="jumbotron text-center bg-light p-5 rounded">
+                <h1 class="display-4">🎌 Bienvenido a Mangaverse</h1>
+                <p class="lead">Explora miles de mangas, manhwas y manhuas</p>
+                <hr class="my-4">
+                <p>Descubre nuevos títulos, busca tus favoritos y lee online</p>
+                <div class="mt-4">
+                    <a class="btn btn-primary btn-lg m-2" href="{{ url_for('mangas.browse_manga') }}" role="button">
+                        <i class="fas fa-book"></i> Explorar Mangas
+                    </a>
+                    <a class="btn btn-success btn-lg m-2" href="{{ url_for('mangas.latest_manga') }}" role="button">
+                        <i class="fas fa-star"></i> Más Recientes
+                    </a>
+                    <a class="btn btn-info btn-lg m-2" href="{{ url_for('mangas.search_manga') }}" role="button">
+                        <i class="fas fa-search"></i> Buscar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-book fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">Miles de Títulos</h5>
+                    <p class="card-text">Accede a una amplia colección de mangas, manhwas y manhuas.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-sync-alt fa-3x text-success mb-3"></i>
+                    <h5 class="card-title">Actualizaciones Constantes</h5>
+                    <p class="card-text">Nuevos capítulos y títulos agregados regularmente.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-filter fa-3x text-info mb-3"></i>
+                    <h5 class="card-title">Búsqueda Avanzada</h5>
+                    <p class="card-text">Filtra por género, tipo y más para encontrar tu próxima lectura.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

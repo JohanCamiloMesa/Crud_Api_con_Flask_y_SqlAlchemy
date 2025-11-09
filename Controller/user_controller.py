@@ -565,9 +565,8 @@ def login_page():
             session['username'] = user.username
             session['is_authenticated'] = True
             
-            # Configurar sesión permanente si se seleccionó "recordarme"
-            if remember_me:
-                session.permanent = True
+            # Hacer la sesión permanente para evitar que expire rápidamente
+            session.permanent = True
             
             logger.info(f'Login web exitoso para usuario: {username}')
             flash(f'¡Bienvenido {user.username}! Usa el dashboard para obtener tu token JWT.', 'success')

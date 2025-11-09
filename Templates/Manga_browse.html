@@ -1,0 +1,122 @@
+{% extends 'Layout.html' %}
+
+{% block title %}Explorar Mangas{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1 class="mb-4"><i class="fas fa-book"></i> Explorar Mangas</h1>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('mangas.browse_manga') }}">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label for="genres">Géneros (separados por coma):</label>
+                        <input type="text" class="form-control" id="genres" name="genres" 
+                               value="{{ current_genres }}" placeholder="Ej: Action,Fantasy">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="type">Tipo:</label>
+                        <select class="form-control" id="type" name="type">
+                            <option value="all" {% if current_type == 'all' %}selected{% endif %}>Todos</option>
+                            <option value="manga" {% if current_type == 'manga' %}selected{% endif %}>Manga</option>
+                            <option value="manhwa" {% if current_type == 'manhwa' %}selected{% endif %}>Manhwa</option>
+                            <option value="manhua" {% if current_type == 'manhua' %}selected{% endif %}>Manhua</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="nsfw">NSFW:</label>
+                        <select class="form-control" id="nsfw" name="nsfw">
+                            <option value="true" {% if current_nsfw %}selected{% endif %}>Incluir</option>
+                            <option value="false" {% if not current_nsfw %}selected{% endif %}>Excluir</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="page">Página:</label>
+                        <input type="number" class="form-control" id="page" name="page" 
+                               value="{{ page }}" min="1">
+                    </div>
+                    <div class="col-md-3">
+                        <label>&nbsp;</label>
+                        <button type="submit" class="btn btn-primary btn-block">
+                            <i class="fas fa-filter"></i> Filtrar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if error %}
+    <div class="alert alert-danger">
+        <i class="fas fa-exclamation-triangle"></i> {{ error }}
+    </div>
+    {% endif %}
+
+    <!-- Lista de Mangas -->
+    {% if mangas %}
+    <div class="row">
+        {% for manga in mangas %}
+        <div class="col-md-3 mb-4">
+            <div class="card h-100">
+                {% if manga.thumb %}
+                <img src="{{ manga.thumb }}" class="card-img-top" alt="{{ manga.title }}" 
+                     style="height: 300px; object-fit: cover;">
+                {% else %}
+                <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" 
+                     style="height: 300px;">
+                    <i class="fas fa-book fa-4x text-white"></i>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ manga.title }}</h5>
+                    {% if manga.genres %}
+                    <p class="card-text">
+                        <small class="text-muted">
+                            {% for genre in manga.genres[:3] %}
+                                <span class="badge badge-secondary">{{ genre }}</span>
+                            {% endfor %}
+                        </small>
+                    </p>
+                    {% endif %}
+                    {% if manga.type %}
+                    <p class="card-text">
+                        <span class="badge badge-info">{{ manga.type }}</span>
+                    </p>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('mangas.manga_detail', manga_id=manga._id or manga.id) }}" 
+                       class="btn btn-sm btn-primary btn-block">
+                        <i class="fas fa-eye"></i> Ver Detalles
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Paginación -->
+    <div class="row mt-4">
+        <div class="col-md-12 text-center">
+            {% if page > 1 %}
+            <a href="{{ url_for('mangas.browse_manga', page=page-1, genres=current_genres, type=current_type, nsfw=current_nsfw) }}" 
+               class="btn btn-secondary">
+                <i class="fas fa-chevron-left"></i> Anterior
+            </a>
+            {% endif %}
+            <span class="mx-3">Página {{ page }}</span>
+            <a href="{{ url_for('mangas.browse_manga', page=page+1, genres=current_genres, type=current_type, nsfw=current_nsfw) }}" 
+               class="btn btn-secondary">
+                Siguiente <i class="fas fa-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center">
+        <i class="fas fa-info-circle"></i> No se encontraron mangas con los filtros seleccionados.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

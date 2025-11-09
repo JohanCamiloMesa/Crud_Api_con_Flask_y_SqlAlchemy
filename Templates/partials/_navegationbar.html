@@ -4,6 +4,26 @@
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarText">
+        <!-- Navigation Links -->
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+                {% if session.get('is_authenticated') %}
+                <a class="nav-link" href="{{ url_for('animes.directory') }}">
+                    <i class="fas fa-tv"></i> Directorio
+                </a>
+                {% else %}
+                <a class="nav-link" href="{{ url_for('animes.home') }}">
+                    <i class="fas fa-tv"></i> Animes
+                </a>
+                {% endif %}
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('mangas.manga_home') }}">
+                    <i class="fas fa-book"></i> Mangas
+                </a>
+            </li>
+        </ul>
+        
         <!-- Search bar in center -->
         <form class="d-flex mx-auto" method="GET" action="{{ url_for('animes.search') }}" style="width: 600px;">
             <input class="form-control me-2" type="search" name="query" placeholder="Buscar anime por nombre" aria-label="Search">

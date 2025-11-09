@@ -1,15 +1,16 @@
-# 🎬 CRUD API con Flask y SQLAlchemy - Sistema Avanzado de Gestión de Animes
+# 🎬 CRUD API con Flask y SQLAlchemy - Sistema Avanzado de Gestión de Animes y Mangas
 
-Una aplicación web completa y segura de gestión de animes desarrollada con Flask, SQLAlchemy y MySQL que incluye un **sistema JWT manual de dos pasos**, interfaz web moderna, API REST protegida y funcionalidades avanzadas de seguridad.
+Una aplicación web completa y segura de gestión de animes y mangas desarrollada con Flask, SQLAlchemy y MySQL que incluye un **sistema JWT manual de dos pasos**, **integración con API de Mangaverse**, interfaz web moderna, API REST protegida y funcionalidades avanzadas de seguridad.
 
 ## ✨ Características Principales
 
 ### 🔐 **Sistema de Autenticación Avanzado**
 - **JWT Manual de Dos Pasos**: Generación de token + Autenticación Manual obligatoria
 - **Seguridad Individual por Usuario**: Cada usuario debe usar únicamente SUS propios tokens
-- **Auto-Logout Inteligente**: Cierre automático de sesión al cerrar página/pestaña
+- **Auto-Logout Inteligente**: Cierre automático de sesión al cerrar página/pestaña (sin interferir con navegación interna)
 - **Gestión de Múltiples Pestañas**: Manejo inteligente de sesiones en varias pestañas
 - **Limpieza Automática**: LocalStorage se limpia automáticamente entre usuarios
+- **Sesiones Persistentes**: Sesiones duran 7 días con renovación automática
 
 ### 🎨 **Interfaz de Usuario Moderna**
 - **Dashboard Interactivo**: Panel personalizado con información de token en tiempo real
@@ -30,6 +31,16 @@ Una aplicación web completa y segura de gestión de animes desarrollada con Fla
 - **Filtros Avanzados**: Búsqueda por género, año, tipo, estado y nombre
 - **Directorio Inteligente**: Vista optimizada con paginación y ordenamiento
 - **Formulario Mejorado**: Validación en tiempo real y experiencia de usuario fluida
+
+### 📚 **Integración con API de Mangaverse** (NUEVO)
+- **6 Endpoints de RapidAPI**: Acceso a miles de mangas, manhwas y manhuas
+- **Exploración de Mangas**: Navega por catálogo completo con filtros avanzados
+- **Búsqueda Inteligente**: Encuentra mangas por título, género y tipo
+- **Visualización de Detalles**: Información completa con sinopsis, autores, géneros
+- **Lector de Capítulos**: Visor integrado con lazy loading de imágenes
+- **Mangas Recientes**: Descubre los últimos títulos publicados
+- **Filtros por Tipo**: Manga, Manhwa, Manhua y contenido NSFW
+- **API REST Interna**: Endpoints JSON para integración con otras aplicaciones
 
 ## 📋 Requisitos del Sistema
 
@@ -86,24 +97,32 @@ La aplicación estará disponible en `http://localhost:5000`
 ```
 ├── app.py                 # Configuración principal de Flask
 ├── index.py              # Punto de entrada de la aplicación
-├── requirements.txt      # Dependencias del proyecto
+├── requirements.txt      # Dependencias del proyecto (incluye requests)
 ├── Config/
 │   └── db_config.py     # Configuración de base de datos
 ├── Controller/
 │   ├── animes_controller.py    # Controlador de animes
-│   └── user_controller.py      # Controlador de usuarios
+│   ├── user_controller.py      # Controlador de usuarios
+│   └── manga_controller.py     # Controlador de mangas (API Mangaverse)
 ├── Models/
 │   ├── anime_model.py   # Modelo de datos de anime
 │   └── user_model.py    # Modelo de datos de usuario
 ├── Services/
 │   ├── anime_service.py # Lógica de negocio de animes
-│   └── user_service.py  # Lógica de negocio de usuarios
+│   ├── user_service.py  # Lógica de negocio de usuarios
+│   └── manga_service.py # Servicio de API de Mangaverse
 ├── repositories/
 │   └── user_repository.py     # Capa de acceso a datos
 ├── Templates/           # Plantillas HTML
 │   ├── Index.html
 │   ├── Dashboard.html
 │   ├── Login.html
+│   ├── Manga_home.html        # Inicio de mangas
+│   ├── Manga_browse.html      # Explorar mangas
+│   ├── Manga_latest.html      # Mangas recientes
+│   ├── Manga_search.html      # Búsqueda de mangas
+│   ├── Manga_detail.html      # Detalle del manga
+│   ├── Manga_reader.html      # Lector de capítulos
 │   └── ...
 ├── Utils/
 │   └── database.py      # Configuración de SQLAlchemy
@@ -145,6 +164,43 @@ La aplicación estará disponible en `http://localhost:5000`
 - `GET /users/profile-page` - Perfil de usuario
 - `POST /users/validate-token` - Validar token manualmente
 - `GET /users/` - Lista de usuarios (requiere JWT)
+
+### 📚 **Mangaverse API** (NUEVO)
+
+#### **Rutas Web (HTML)**
+- `GET /manga/` - Página principal de mangas
+- `GET /manga/browse` - Explorar mangas con filtros (género, tipo, NSFW, paginación)
+- `GET /manga/latest` - Ver mangas más recientes
+- `GET /manga/search` - Buscar mangas por texto
+- `GET /manga/detail/<manga_id>` - Ver detalles completos de un manga
+- `GET /manga/chapter/<chapter_id>` - Leer capítulo (visor con lazy loading)
+
+#### **Rutas API (JSON)**
+- `GET /manga/api/fetch` - Obtener mangas con filtros (JSON)
+- `GET /manga/api/latest` - Obtener mangas recientes (JSON)
+- `GET /manga/api/search` - Buscar mangas (JSON)
+- `GET /manga/api/detail/<manga_id>` - Obtener detalle de manga (JSON)
+- `GET /manga/api/chapters/<manga_id>` - Obtener capítulos (JSON)
+- `GET /manga/api/images/<chapter_id>` - Obtener imágenes de capítulo (JSON)
+
+**Parámetros de consulta disponibles:**
+- `page` - Número de página (default: 1)
+- `genres` - Géneros separados por coma (ej: "Action,Fantasy")
+- `type` - Tipo: "all", "manga", "manhwa", "manhua"
+- `nsfw` - Incluir contenido NSFW: "true" o "false"
+- `q` - Texto de búsqueda
+
+**Ejemplo de uso:**
+```bash
+# Buscar mangas de acción
+GET /manga/browse?genres=Action&type=manga&page=1
+
+# Buscar por texto
+GET /manga/search?q=naruto
+
+# API JSON
+GET /manga/api/latest?type=manhwa&nsfw=false
+```
 
 ## 🎯 Guía de Uso Completa
 
@@ -194,7 +250,72 @@ La aplicación estará disponible en `http://localhost:5000`
 3. **Eliminar**: Solo entonces puedes eliminar animes
 4. **Seguridad**: Solo puedes usar TU propio token
 
-### 🔒 **4. Características de Seguridad**
+### � **4. Explorar Mangas** (NUEVO)
+
+#### **Navegación desde Navbar**
+- **Si estás autenticado**: El menú muestra "Directorio" → Acceso a animes y mangas
+- **Si NO estás autenticado**: El menú muestra "Animes" → Solo acceso a animes
+
+#### **Explorar Catálogo**
+1. **Página Principal**: `/manga/` - Vista general con últimos mangas
+2. **Browse**: `/manga/browse` - Filtros por:
+   - **Géneros**: Action, Fantasy, Romance, Comedy, Drama, etc.
+   - **Tipo**: Manga (japonés), Manhwa (coreano), Manhua (chino)
+   - **NSFW**: Incluir/excluir contenido adulto
+   - **Paginación**: 20 mangas por página
+3. **Últimos**: `/manga/latest` - Mangas más recientes agregados
+
+#### **Buscar Mangas**
+1. Ir a `/manga/search`
+2. Ingresar texto de búsqueda (título, autor, descripción)
+3. Ver resultados con información completa
+
+#### **Leer Mangas**
+1. **Seleccionar Manga**: Clic en cualquier manga del catálogo
+2. **Ver Detalles**: `/manga/detail/<id>` muestra:
+   - Título, autor, géneros
+   - Sinopsis completa
+   - Estado (En curso/Completado)
+   - Lista de capítulos disponibles
+3. **Leer Capítulo**: `/manga/chapter/<id>` incluye:
+   - Visor optimizado con lazy loading
+   - Navegación con teclado (← →)
+   - Todas las páginas del capítulo
+
+#### **Características del Visor**
+- **Lazy Loading**: Las imágenes cargan bajo demanda
+- **Navegación**: Flechas del teclado para cambiar página
+- **Responsive**: Se adapta a cualquier dispositivo
+- **Fullscreen**: Las imágenes ocupan el ancho completo
+
+#### **API JSON** (Para Desarrollo)
+Todos los endpoints tienen versión API que retorna JSON:
+```bash
+# Fetch mangas con filtros
+GET /manga/api/fetch?genres=Action&type=manga&nsfw=false
+
+# Buscar
+GET /manga/api/search?q=one+piece
+
+# Detalles
+GET /manga/api/detail/507 
+
+# Capítulos de un manga
+GET /manga/api/chapters/507
+
+# Imágenes de un capítulo
+GET /manga/api/images/12345
+```
+
+**📖 Documentación Adicional de Manga:**
+Para guías detalladas de implementación, consulta:
+- `MANGA_API_DOCUMENTATION.md` - Documentación completa de la API
+- `MANGA_QUICK_START.md` - Guía de inicio rápido
+- `RESUMEN_INTEGRACION.md` - Resumen técnico de la integración
+- `EJEMPLOS_USO.md` - Ejemplos prácticos de uso
+- `INDICE_DOCUMENTACION.md` - Índice de toda la documentación
+
+### � **5. Características de Seguridad**
 
 #### **Individual por Usuario**
 - Cada usuario debe generar **SUS PROPIOS** tokens
@@ -455,6 +576,7 @@ Flask-JWT-Extended   # Sistema JWT con validación individual
 PyMySQL             # Conector MySQL optimizado
 Werkzeug            # Utilidades web y seguridad
 Python-dotenv       # Gestión de variables de entorno
+Requests            # Cliente HTTP para Mangaverse API
 ```
 
 ### **Frontend (Moderno)**
@@ -564,6 +686,62 @@ developer = {
 3. **Prueba en entorno limpio** - aislamiento de dependencias
 4. **Revisa los logs** - pueden dar pistas del problema
 
+### **⚠️ Troubleshooting - Mangaverse API**
+
+#### **❌ Error: "No se pueden cargar los mangas"**
+**Causa**: Timeout o problema de conexión con RapidAPI
+**Solución**:
+```python
+# Verifica que requests esté instalado
+pip install requests
+
+# Revisa la clave API en Services/manga_service.py
+api_key = "88a37b9498msh5fc28ceb6f43225p18a811jsn7df696001185"
+
+# Prueba la conexión manualmente
+python -c "import requests; print(requests.get('https://mangaverse-api.p.rapidapi.com/manga/fetch', headers={'X-RapidAPI-Key': 'TU_KEY'}).status_code)"
+```
+
+#### **❌ Error: "Las imágenes no cargan"**
+**Causa**: API retorna lista vacía o formato incorrecto
+**Solución**:
+- Verifica que el capítulo tenga imágenes disponibles
+- Algunos mangas pueden tener capítulos sin imágenes aún
+- Intenta con otro capítulo del mismo manga
+
+#### **❌ Error: "AttributeError: 'list' object has no attribute 'get'"**
+**Causa**: Código intenta acceder a lista como diccionario
+**Solución**: YA CORREGIDO en versión actual
+```python
+# Código correcto (ya implementado):
+images = [img.get('link') for img in data if isinstance(img, dict)]
+```
+
+#### **❌ Error: "Timeout después de 10 segundos"**
+**Causa**: RapidAPI tardando mucho en responder
+**Solución**:
+```python
+# En manga_service.py, ajusta el timeout:
+response = requests.get(url, headers=headers, timeout=30)  # Aumentar a 30s
+```
+
+#### **❌ Error: "Límite de API excedido"**
+**Causa**: Plan gratuito de RapidAPI tiene límites mensuales
+**Solución**:
+- Verifica uso en [RapidAPI Dashboard](https://rapidapi.com/dashboard)
+- Plan gratuito: ~500 requests/mes
+- Considera actualizar plan si necesitas más
+
+#### **💡 Tips de Optimización**
+```python
+# Cachear respuestas frecuentes (opcional)
+from functools import lru_cache
+
+@lru_cache(maxsize=100)
+def fetch_manga_cached(page, genres, type, nsfw):
+    return manga_api.fetch_manga(page, genres, type, nsfw)
+```
+
 ### **📋 Template para Issues**
 ```markdown
 ## 🐛 Descripción del Bug
@@ -602,6 +780,7 @@ Si aplica, adjunta capturas de pantalla.
 - **Bootstrap Team** - Por el sistema de diseño
 - **JWT.io** - Por la especificación JWT
 - **MySQL Team** - Por el sistema de base de datos
+- **RapidAPI & Mangaverse API** - Por proveer acceso a miles de mangas
 - **Open Source Community** - Por inspiración y recursos
 
 ### **📚 Recursos y Referencias**
@@ -609,6 +788,7 @@ Si aplica, adjunta capturas de pantalla.
 - [JWT Best Practices](https://auth0.com/blog/a-look-at-the-latest-draft-for-jwt-bcp/)
 - [OWASP Security Guidelines](https://owasp.org/www-project-top-ten/)
 - [Bootstrap 5 Documentation](https://getbootstrap.com/docs/5.3/)
+- [Mangaverse API on RapidAPI](https://rapidapi.com/hub)
 
 ---
 
